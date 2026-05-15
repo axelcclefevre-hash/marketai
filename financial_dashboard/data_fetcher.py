@@ -281,6 +281,74 @@ def _empty_asset(name: str, ticker: str, error: str) -> dict:
     }
 
 
+def fetch_news(newsapi_key: str = "", guardian_key: str = "") -> list[dict]:
+    """Fetch economic/geopolitical headlines from multiple sources."""
+    import re
+    headlines: list[dict] = []
+
+    # ── NewsAPI (business FR + EN) ────────────────────────────────────────────
+    if newsapi_key:
+        for lang in ("fr", "en"):
+            try:
+                r = requests.get(
+                    "https://newsapi.org/v2/top-headlines",
+                    params={"category": "business", "language": lang, "pageSize": 6, "apiKey": newsapi_key},
+                    timeout=8,
+                )
+                if r.ok:
+                    for a in r.json().get("articles", []):
+                        if a.get("title") and "[Removed]" not in a["title"]:
+                            headlines.append({"title": a["title"], "source": a["source"]["name"], "url": a.get("url", "")})
+            except Exception as e:
+                logger.warning("NewsAPI %s failed: %s", lang, e)
+
+    # ── The Guardian ──────────────────────────────────────────────────────────
+    if guardian_key:
+        try:
+            r = requests.get(
+                "https://content.guardianapis.com/search",
+                params={"q": "economy OR geopolitics OR market OR trade OR finance", "page-size": 8, "api-key": guardian_key},
+                timeout=8,
+            )
+            if r.ok:
+                for a in r.json().get("response", {}).get("results", []):
+                    headlines.append({"title": a["webTitle"], "source": "The Guardian", "url": a.get("webUrl", "")})
+        except Exception as e:
+            logger.warning("Guardian API failed: %s", e)
+
+    # ── RSS gratuits (sans clé) ───────────────────────────────────────────────
+    rss_feeds = [
+        ("https://feeds.bbci.co.uk/news/business/rss.xml", "BBC Business"),
+        ("https://feeds.reuters.com/reuters/businessNews", "Reuters"),
+        ("https://www.ft.com/?format=rss", "Financial Times"),
+        ("https://feeds.finance.yahoo.com/rss/2.0/headline?s=%5EGSPC&region=US&lang=en-US", "Yahoo Finance"),
+    ]
+    for feed_url, source_name in rss_feeds:
+        if len(headlines) >= 16:
+            break
+        try:
+            r = requests.get(feed_url, timeout=6, headers={"User-Agent": "Mozilla/5.0"})
+            if r.ok:
+                titles = re.findall(r"<title>(?:<!\[CDATA\[)?(.+?)(?:\]\]>)?</title>", r.text)
+                for t in titles[:5]:
+                    t = t.strip()
+                    if t and len(t) > 20 and source_name not in t:
+                        headlines.append({"title": t, "source": source_name, "url": ""})
+        except Exception as e:
+            logger.warning("RSS %s failed: %s", source_name, e)
+
+    # Dédupliquer par titre
+    seen = set()
+    unique = []
+    for h in headlines:
+        key = h["title"][:60]
+        if key not in seen:
+            seen.add(key)
+            unique.append(h)
+
+    return unique[:16]
+
+
 def get_prices_df(assets: dict) -> pd.DataFrame:
     """Construit un DataFrame des séries de clôture pour la matrice de corrélation."""
     series = {}

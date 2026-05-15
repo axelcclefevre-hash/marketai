@@ -22,15 +22,14 @@ def _get_client(api_key: str) -> anthropic.Anthropic:
 
 # ── Rapport macro ─────────────────────────────────────────────────────────────
 
-def generate_macro_report(assets: dict, api_key: str) -> str:
+def generate_macro_report(assets: dict, api_key: str, news: list[dict] | None = None) -> str:
     """
-    Envoie un résumé des performances à Claude et reçoit un commentaire
-    macro de ~200 mots en français.
+    Génère un rapport macro structuré en markdown (~400 mots) enrichi
+    avec des actualités géopolitiques/économiques si disponibles.
     """
     try:
         client = _get_client(api_key)
 
-        # Construire le résumé textuel des actifs
         lines = []
         for name, asset in assets.items():
             if asset.get("error"):
@@ -40,28 +39,52 @@ def generate_macro_report(assets: dict, api_key: str) -> str:
             ind = asset.get("indicators", {})
             rsi = ind.get("rsi")
             vol = ind.get("volatility")
+            signal = (asset.get("claude_score") or {}).get("signal", "")
             lines.append(
                 f"- {name} ({asset.get('category', '')}) : "
                 f"prix={cur:.4g}, variation={pct:+.2f}%"
                 + (f", RSI={rsi:.1f}" if rsi else "")
                 + (f", volatilité={vol:.1f}%" if vol else "")
+                + (f", signal={signal}" if signal else "")
             )
 
         summary = "\n".join(lines)
         today   = datetime.utcnow().strftime("%d/%m/%Y")
 
-        prompt = (
-            f"Date : {today}\n\n"
-            "Voici les données de marché du jour :\n"
-            f"{summary}\n\n"
-            "En tant qu'analyste financier senior, rédigez un commentaire macro de marché "
-            "d'environ 200 mots en français. Identifiez les tendances clés, les risques "
-            "majeurs et les opportunités. Soyez précis, factuel et professionnel."
-        )
+        news_block = ""
+        if news:
+            news_block = "\n\nActualités géopolitiques et économiques du jour :\n"
+            for n in news:
+                source = n.get("source", "")
+                title  = n.get("title", "")
+                news_block += f"- [{source}] {title}\n"
+
+        prompt = f"""Date : {today}
+
+Données de marché du jour :
+{summary}
+{news_block}
+
+En tant qu'analyste macro senior, rédigez un rapport structuré en **markdown** avec exactement ces sections :
+
+## Tendances de marché
+Commentez les mouvements clés des indices, des matières premières, des devises et des cryptos. Mentionnez les niveaux RSI significatifs et les signaux techniques. Soyez précis sur les chiffres.
+
+## Contexte géopolitique & économique
+Analysez les actualités du jour et leur impact sur les marchés. Faites des liens directs entre les événements et les mouvements de prix observés. Si aucune actualité n'est fournie, analysez le contexte macro global déduit des mouvements de prix.
+
+## Risques & Opportunités
+**Risques :** listez 3 risques principaux identifiés.
+**Opportunités :** listez 2-3 opportunités à surveiller.
+
+## Synthèse
+En une phrase concise : quelle est l'orientation probable du marché pour les prochaines 48 heures et quel est le sentiment dominant ?
+
+Utilisez du **gras** pour mettre en évidence les chiffres clés et concepts importants. Environ 400 mots. Soyez factuel, professionnel et perspicace."""
 
         message = client.messages.create(
             model=CLAUDE_MODEL,
-            max_tokens=600,
+            max_tokens=1200,
             messages=[{"role": "user", "content": prompt}],
         )
         return message.content[0].text

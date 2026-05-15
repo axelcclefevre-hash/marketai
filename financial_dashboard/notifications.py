@@ -1,4 +1,4 @@
-# notifications.py — Alertes desktop Windows via plyer
+"""  """# notifications.py — Alertes desktop Windows via plyer
 
 import logging
 import os

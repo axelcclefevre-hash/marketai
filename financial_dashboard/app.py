@@ -41,265 +41,295 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-/* ── Revolut-inspired — compatible light & dark ───────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:ital,wght@0,700;1,700&display=swap');
 
-/* Sidebar padding reset */
-[data-testid="stSidebarContent"] {
-    padding: 0 !important;
+/* ── Base ─────────────────────────────────────────────────────────────── */
+html, body, [class*="css"], .stMarkdown, button, input {
+    font-family: 'DM Sans', 'Helvetica Neue', sans-serif !important;
 }
 
-/* Cartes métriques — utilise les variables Streamlit pour s'adapter au thème */
+/* Tabular nums — tous les chiffres financiers */
+[data-testid="stMetricValue"], [data-testid="stMetricDelta"],
+.rv-stat-value, .rv-stat-delta-pos, .rv-stat-delta-neg {
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Sidebar ──────────────────────────────────────────────────────────── */
+[data-testid="stSidebarContent"] { padding: 0 !important; }
+
+/* ── Metric cards ─────────────────────────────────────────────────────── */
 [data-testid="metric-container"] {
     background: var(--secondary-background-color);
-    border: 1px solid rgba(128,128,128,0.18);
-    border-radius: 12px;
+    border: 1px solid #EAEAEA;
+    border-radius: 8px;
     padding: 16px 20px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-    transition: box-shadow 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s, transform 0.2s;
 }
 [data-testid="metric-container"]:hover {
-    box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transform: translateY(-1px);
 }
 [data-testid="metric-container"] label {
-    font-size: 0.72rem !important;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    font-size: 0.70rem !important;
+    letter-spacing: 0.05em;
     font-weight: 500;
-    opacity: 0.65;
+    opacity: 0.50;
+    text-transform: uppercase;
 }
 [data-testid="stMetricValue"] {
     font-size: 1.4rem !important;
     font-weight: 700;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
 }
 [data-testid="stMetricDelta"] {
-    font-size: 0.82rem !important;
+    font-size: 0.80rem !important;
     font-weight: 600;
 }
 
-/* Tabs — style pill, compatible dark/light */
+/* ── Tabs ─────────────────────────────────────────────────────────────── */
 .stTabs [data-baseweb="tab-list"] {
     background: var(--secondary-background-color);
-    border-radius: 10px;
-    padding: 4px;
+    border-radius: 8px;
+    padding: 3px;
     gap: 2px;
-    border: 1px solid rgba(128,128,128,0.18);
+    border: 1px solid #EAEAEA;
 }
 .stTabs [data-baseweb="tab"] {
-    border-radius: 7px;
+    border-radius: 6px;
     font-size: 0.84rem;
     font-weight: 500;
-    padding: 8px 18px;
+    padding: 7px 16px;
     background: transparent;
-    transition: all 0.2s;
+    transition: all 0.18s;
     border: none !important;
-    opacity: 0.55;
+    opacity: 0.50;
 }
 .stTabs [aria-selected="true"] {
     background: var(--background-color) !important;
     opacity: 1 !important;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.12) !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
 }
 .stTabs [data-baseweb="tab-highlight"] { display: none !important; }
 .stTabs [data-baseweb="tab-border"]    { display: none !important; }
 
-/* Alertes */
+/* ── Alertes ──────────────────────────────────────────────────────────── */
 .alert-danger {
-    background: rgba(239,68,68,0.10);
-    border-left: 3px solid #ef4444;
-    border-radius: 8px;
+    background: #FDEBEC;
+    border-left: 2px solid #9F2F2D;
+    border-radius: 4px;
     padding: 10px 16px;
     margin: 4px 0;
     font-size: 0.875rem;
-    color: #ef4444;
+    color: #9F2F2D;
 }
 .alert-warning {
-    background: rgba(245,158,11,0.10);
-    border-left: 3px solid #f59e0b;
-    border-radius: 8px;
+    background: #FBF3DB;
+    border-left: 2px solid #956400;
+    border-radius: 4px;
     padding: 10px 16px;
     margin: 4px 0;
     font-size: 0.875rem;
-    color: #f59e0b;
+    color: #956400;
 }
 
-/* Badges signal */
+/* ── Badges signal — pastels mats, coins carrés ───────────────────────── */
 .badge-buy {
-    background: rgba(0,180,90,0.13);
-    border: 1px solid rgba(0,180,90,0.40);
-    color: #059669;
-    padding: 3px 12px;
-    border-radius: 20px;
+    background: #EDF3EC;
+    border: 1px solid rgba(52,101,56,0.20);
+    color: #346538;
+    padding: 2px 8px;
+    border-radius: 4px;
     font-weight: 600;
-    font-size: 0.78rem;
-    letter-spacing: 0.04em;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 .badge-sell {
-    background: rgba(239,68,68,0.13);
-    border: 1px solid rgba(239,68,68,0.40);
-    color: #ef4444;
-    padding: 3px 12px;
-    border-radius: 20px;
+    background: #FDEBEC;
+    border: 1px solid rgba(159,47,45,0.20);
+    color: #9F2F2D;
+    padding: 2px 8px;
+    border-radius: 4px;
     font-weight: 600;
-    font-size: 0.78rem;
-    letter-spacing: 0.04em;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 .badge-hold {
-    background: rgba(217,119,6,0.13);
-    border: 1px solid rgba(217,119,6,0.40);
-    color: #d97706;
-    padding: 3px 12px;
-    border-radius: 20px;
+    background: #FBF3DB;
+    border: 1px solid rgba(149,100,0,0.20);
+    color: #956400;
+    padding: 2px 8px;
+    border-radius: 4px;
     font-weight: 600;
-    font-size: 0.78rem;
-    letter-spacing: 0.04em;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
-/* Bouton primaire — rouge, centré */
+/* ── Bouton primaire ──────────────────────────────────────────────────── */
 .stButton > button[kind="primary"],
 .stButton > button[data-testid="baseButton-primary"] {
-    background: #e11d48 !important;
+    background: #111111 !important;
     color: #ffffff !important;
-    border-radius: 8px !important;
+    border-radius: 5px !important;
     border: none !important;
     font-weight: 600 !important;
     font-size: 0.875rem !important;
-    transition: opacity 0.2s !important;
+    font-family: 'DM Sans', sans-serif !important;
+    letter-spacing: 0.01em !important;
+    transition: background 0.18s, transform 0.12s !important;
     display: block !important;
     margin: 0 auto !important;
+    box-shadow: none !important;
 }
 .stButton > button[kind="primary"]:hover {
-    opacity: 0.85 !important;
-    background: #e11d48 !important;
+    background: #333333 !important;
+}
+.stButton > button[kind="primary"]:active {
+    transform: scale(0.98) !important;
 }
 
-/* Séparateurs */
-hr { border-color: rgba(128,128,128,0.18) !important; margin: 20px 0 !important; }
+/* ── Séparateurs ──────────────────────────────────────────────────────── */
+hr { border-color: #EAEAEA !important; margin: 20px 0 !important; }
 
-/* DataFrames */
+/* ── DataFrames ───────────────────────────────────────────────────────── */
 [data-testid="stDataFrame"] {
-    border-radius: 10px;
+    border-radius: 8px;
     overflow: hidden;
-    border: 1px solid rgba(128,128,128,0.18) !important;
+    border: 1px solid #EAEAEA !important;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 5px; height: 5px; }
+/* ── Scrollbar ────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.3); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,0.5); }
+::-webkit-scrollbar-thumb { background: #EAEAEA; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #d0d0d0; }
 
 /* ── Header principal ─────────────────────────────────────────────────── */
 .rv-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 0 24px 0;
-    border-bottom: 1px solid rgba(128,128,128,0.18);
-    margin-bottom: 28px;
+    padding: 0 0 28px 0;
+    border-bottom: 1px solid #EAEAEA;
+    margin-bottom: 32px;
 }
-.rv-header-left { display: flex; align-items: center; gap: 16px; }
+.rv-header-left { display: flex; align-items: center; gap: 14px; }
 .rv-logo {
-    width: 52px; height: 52px;
-    background: linear-gradient(135deg, #00b86b 0%, #0ea5e9 100%);
-    border-radius: 16px;
+    width: 44px; height: 44px;
+    background: #111111;
+    border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 26px; line-height: 1;
-    box-shadow: 0 4px 14px rgba(0,184,107,0.30);
     flex-shrink: 0;
+    color: #ffffff;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: -0.02em;
 }
 .rv-title {
-    font-size: 2rem;
-    font-weight: 800;
+    font-family: 'Newsreader', serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    font-style: italic;
     letter-spacing: -0.03em;
     margin: 0;
-    line-height: 1.15;
+    line-height: 1.1;
 }
 .rv-subtitle {
-    font-size: 0.82rem;
-    margin: 3px 0 0 0;
+    font-size: 0.78rem;
+    margin: 4px 0 0 0;
     font-weight: 400;
-    opacity: 0.55;
+    color: #787774;
+    letter-spacing: 0.01em;
 }
 .rv-live {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.78rem;
-    color: #059669;
+    font-size: 0.72rem;
+    color: #346538;
     font-weight: 600;
-    background: rgba(5,150,105,0.10);
-    padding: 6px 14px;
-    border-radius: 20px;
-    border: 1px solid rgba(5,150,105,0.28);
+    background: #EDF3EC;
+    padding: 5px 12px;
+    border-radius: 4px;
+    border: 1px solid rgba(52,101,56,0.18);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 .rv-live-dot {
-    width: 7px; height: 7px;
-    background: #059669;
+    width: 6px; height: 6px;
+    background: #346538;
     border-radius: 50%;
-    animation: blink 2s infinite;
+    animation: blink 2.4s infinite;
     display: inline-block;
 }
 @keyframes blink {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
+    50% { opacity: 0.2; }
 }
 
 /* ── Sidebar header ───────────────────────────────────────────────────── */
 .rv-sidebar-header {
     padding: 20px 16px 14px 16px;
-    border-bottom: 1px solid rgba(128,128,128,0.18);
+    border-bottom: 1px solid #EAEAEA;
     margin-bottom: 4px;
 }
-.rv-sidebar-logo {
-    display: flex; align-items: center; gap: 10px;
-}
+.rv-sidebar-logo { display: flex; align-items: center; gap: 10px; }
 .rv-sidebar-logo-icon {
-    width: 30px; height: 30px;
-    background: linear-gradient(135deg, #00b86b 0%, #0ea5e9 100%);
-    border-radius: 9px;
+    width: 28px; height: 28px;
+    background: #111111;
+    border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 15px; flex-shrink: 0;
+    flex-shrink: 0;
+    color: #ffffff;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: -0.01em;
 }
 .rv-sidebar-title {
-    font-size: 1.05rem;
+    font-size: 1rem;
     font-weight: 700;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
 }
 
 /* Section label sidebar */
 .rv-section-label {
-    font-size: 0.68rem;
+    font-size: 0.65rem;
     font-weight: 600;
-    opacity: 0.45;
+    color: #787774;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     padding: 14px 16px 6px 16px;
 }
 
 /* Stat card sidebar */
 .rv-stat-block {
     background: var(--secondary-background-color);
-    border: 1px solid rgba(128,128,128,0.18);
-    border-radius: 10px;
+    border: 1px solid #EAEAEA;
+    border-radius: 8px;
     padding: 12px 16px;
     margin: 0 12px 12px 12px;
 }
 .rv-stat-label {
-    font-size: 0.7rem;
-    opacity: 0.55;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    font-size: 0.68rem;
+    color: #787774;
+    letter-spacing: 0.04em;
     font-weight: 500;
+    text-transform: uppercase;
 }
 .rv-stat-value {
     font-size: 1.25rem;
     font-weight: 700;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
     margin-top: 2px;
+    font-variant-numeric: tabular-nums;
 }
-.rv-stat-delta-pos { color: #059669; font-size: 0.82rem; font-weight: 600; }
-.rv-stat-delta-neg { color: #ef4444; font-size: 0.82rem; font-weight: 600; }
+.rv-stat-delta-pos { color: #346538; font-size: 0.80rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.rv-stat-delta-neg { color: #9F2F2D; font-size: 0.80rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -326,26 +356,26 @@ def load_all_data(force: bool = False):
     if not force and cache_is_fresh() and cached:
         data = cached
     else:
-        with st.spinner("📡 Récupération des données de marché..."):
+        with st.spinner("Récupération des données de marché..."):
             data = fetch_all_data(fred_api_key=FRED_KEY)
 
     assets = data.get("assets", {})
 
-    with st.spinner("⚙️ Calcul des indicateurs techniques..."):
+    with st.spinner("Calcul des indicateurs techniques..."):
         enrich_assets(assets)
 
     if ANTHROPIC_KEY:
         needs_scores = not all(a.get("claude_score") for a in assets.values() if not a.get("error"))
         if needs_scores:
-            with st.spinner("🤖 Analyse Claude — scores BUY/HOLD/SELL..."):
+            with st.spinner("Analyse Claude — scores BUY/HOLD/SELL..."):
                 score_all_assets(assets, ANTHROPIC_KEY)
 
         if not data.get("macro_report"):
-            with st.spinner("📝 Génération du rapport macro..."):
+            with st.spinner("Génération du rapport macro..."):
                 data["macro_report"] = generate_macro_report(assets, ANTHROPIC_KEY)
 
     # Portefeuille
-    with st.spinner("💼 Mise à jour du portefeuille fictif..."):
+    with st.spinner("Mise à jour du portefeuille fictif..."):
         data["portfolio"] = get_or_update_portfolio(assets)
 
     from data_fetcher import save_cache
@@ -409,7 +439,7 @@ def render_sidebar(data: dict):
     st.sidebar.markdown("""
 <div class="rv-sidebar-header">
   <div class="rv-sidebar-logo">
-    <div class="rv-sidebar-logo-icon">📈</div>
+    <div class="rv-sidebar-logo-icon">M</div>
     <span class="rv-sidebar-title">MarketAI</span>
   </div>
 </div>
@@ -1094,10 +1124,10 @@ def main():
     st.markdown("""
 <div class="rv-header">
   <div class="rv-header-left">
-    <div class="rv-logo">📈</div>
+    <div class="rv-logo">MA</div>
     <div>
-      <div class="rv-title">Dashboard Marchés</div>
-      <div class="rv-subtitle">Analyse en temps réel · IA · Backtesting</div>
+      <div class="rv-title">MarketAI</div>
+      <div class="rv-subtitle">Analyse en temps réel &middot; IA &middot; Backtesting</div>
     </div>
   </div>
   <div class="rv-live">

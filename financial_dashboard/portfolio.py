@@ -25,6 +25,10 @@ MAX_PER_CAT = 4
 
 # Catégories exclues du portefeuille (taux de change et rendements obligataires)
 EXCLUDED_CURRENCIES = {"RATIO", "%"}
+# Devises dont la conversion est instable (JPY) → on évite pour le portefeuille fictif
+EXCLUDED_PORTFOLIO_CURRENCIES = {"RATIO", "%", "JPY"}
+# Catégories non-investissables directement
+EXCLUDED_PORTFOLIO_CATEGORIES = {"Indices", "Obligations"}
 
 # ── Actifs du portefeuille original (v1 du dashboard) ─────────────────────────
 ORIGINAL_ASSET_NAMES = [
@@ -102,103 +106,123 @@ def _current_usd(asset: dict, assets: dict) -> float | None:
 
 def _target_allocation(assets: dict) -> dict[str, float]:
     """
-    Poids cibles (0-1, somme = 1) basés sur signal Claude × confiance.
-    Applique une diversification par catégorie :
-      - max MAX_PER_CAT actifs par catégorie (meilleurs scores)
-      - max MAX_CAT_WEIGHT de poids total par catégorie
-    Exclut le Forex et les obligations pures.
+    Poids cibles garantis de sommer à 1.0.
+    - Exclut les indices, obligations, forex, JPY
+    - Max MAX_PER_CAT actifs par catégorie
+    - Max MAX_POSITIONS au total
+    - Cap de MAX_CAT_WEIGHT par catégorie
     """
-    # ── 1. Scores bruts ──────────────────────────────────────────────────────
-    candidates: dict[str, dict] = {}   # name → {weight, category}
+    # 1. Filtrer les candidats investissables
+    candidates: list[tuple[str, float, str]] = []  # (name, score, category)
     for name, asset in assets.items():
         if asset.get("error"):
             continue
-        if (asset.get("currency") or "USD") in EXCLUDED_CURRENCIES:
+        currency = asset.get("currency") or "USD"
+        category = asset.get("category", "")
+        if currency in EXCLUDED_PORTFOLIO_CURRENCIES:
             continue
-        price_usd = _current_usd(asset, assets)
-        if price_usd is None or price_usd <= 0:
+        if category in EXCLUDED_PORTFOLIO_CATEGORIES:
             continue
-        score  = asset.get("claude_score", {})
-        signal = score.get("signal", "HOLD")
-        conf   = score.get("confidence", 50) / 100
-        w      = SIGNAL_WEIGHTS.get(signal, 0.0) * conf
-        if w > 0:
-            candidates[name] = {
-                "weight":   w,
-                "category": asset.get("category", "Autre"),
-            }
+        price = asset.get("current")
+        if not price or price <= 0:
+            continue
+        score_d = asset.get("claude_score") or {}
+        signal  = score_d.get("signal", "HOLD")
+        conf    = (score_d.get("confidence") or 50) / 100
+        raw_w   = SIGNAL_WEIGHTS.get(signal, 0.0) * conf
+        if raw_w > 0:
+            candidates.append((name, raw_w, category))
 
+    # Fallback équipondéré si aucun signal BUY
     if not candidates:
         eligible = [
             n for n, a in assets.items()
             if not a.get("error")
-            and a.get("currency", "USD") not in EXCLUDED_CURRENCIES
-            and _current_usd(a, assets) is not None
-        ]
-        if eligible:
-            return {n: 1 / min(len(eligible), MAX_POSITIONS)
-                    for n in eligible[:MAX_POSITIONS]}
-        return {}
+            and (a.get("currency") or "USD") not in EXCLUDED_PORTFOLIO_CURRENCIES
+            and (a.get("category") or "") not in EXCLUDED_PORTFOLIO_CATEGORIES
+            and (a.get("current") or 0) > 0
+        ][:MAX_POSITIONS]
+        if not eligible:
+            return {}
+        w = round(1.0 / len(eligible), 8)
+        return {n: w for n in eligible}
 
-    # ── 2. Filtre intra-catégorie : top MAX_PER_CAT par catégorie ────────────
+    # 2. Top MAX_PER_CAT par catégorie
     by_cat: dict[str, list] = {}
-    for name, info in candidates.items():
-        by_cat.setdefault(info["category"], []).append((name, info["weight"]))
+    for name, w, cat in candidates:
+        by_cat.setdefault(cat, []).append((name, w))
 
-    selected: dict[str, float] = {}
+    selected: list[tuple[str, float, str]] = []
     for cat, items in by_cat.items():
         items.sort(key=lambda x: x[1], reverse=True)
         for name, w in items[:MAX_PER_CAT]:
-            selected[name] = w
+            selected.append((name, w, cat))
 
-    # ── 3. Limite globale MAX_POSITIONS ──────────────────────────────────────
-    if len(selected) > MAX_POSITIONS:
-        top = sorted(selected.items(), key=lambda x: x[1], reverse=True)[:MAX_POSITIONS]
-        selected = dict(top)
+    # 3. Limite globale
+    selected.sort(key=lambda x: x[1], reverse=True)
+    selected = selected[:MAX_POSITIONS]
 
-    # ── 4. Normalisation initiale ─────────────────────────────────────────────
-    total = sum(selected.values())
-    weights = {n: w / total for n, w in selected.items()}
+    # 4. Normalisation → somme = 1.0 garantie
+    total = sum(w for _, w, _ in selected)
+    if total == 0:
+        n = len(selected)
+        return {name: round(1.0 / n, 8) for name, _, _ in selected}
+    weights = {name: w / total for name, w, _ in selected}
+    cat_map = {name: cat for name, _, cat in selected}
 
-    # ── 5. Cap par catégorie (MAX_CAT_WEIGHT) — itératif ─────────────────────
-    cat_of = {n: candidates[n]["category"] for n in weights}
-    for _ in range(10):   # max 10 passes de rééquilibrage
-        cat_totals: dict[str, float] = {}
-        for n, w in weights.items():
-            cat_totals[n] = cat_totals.get(cat_of[n], 0) + w   # accumule par catégorie
-        # Recalculer correctement les totaux par catégorie
+    # 5. Cap par catégorie avec redistribution simple
+    for _ in range(20):
         cat_sums: dict[str, float] = {}
         for n, w in weights.items():
-            cat_sums[cat_of[n]] = cat_sums.get(cat_of[n], 0) + w
+            cat_sums[cat_map[n]] = cat_sums.get(cat_map[n], 0) + w
 
-        overflow = {c: s - MAX_CAT_WEIGHT for c, s in cat_sums.items() if s > MAX_CAT_WEIGHT}
-        if not overflow:
-            break   # tout est dans les limites
-        # Réduire les actifs des catégories qui dépassent
-        excess_total = 0.0
+        over = {c for c, s in cat_sums.items() if s > MAX_CAT_WEIGHT + 1e-9}
+        if not over:
+            break
+
+        excess = 0.0
         for n in list(weights):
-            cat = cat_of[n]
-            if cat in overflow:
-                ratio = MAX_CAT_WEIGHT / cat_sums[cat]
-                reduction = weights[n] * (1 - ratio)
-                weights[n] *= ratio
-                excess_total += reduction
-        # Redistribuer l'excès aux catégories non saturées
-        non_capped = [n for n in weights if cat_of[n] not in overflow]
-        if non_capped:
-            nc_total = sum(weights[n] for n in non_capped)
-            if nc_total > 0:
-                for n in non_capped:
-                    weights[n] += excess_total * (weights[n] / nc_total)
-        # Renormaliser
+            if cat_map[n] in over:
+                cap_w = MAX_CAT_WEIGHT * weights[n] / cat_sums[cat_map[n]]
+                excess += weights[n] - cap_w
+                weights[n] = cap_w
+
+        free = [n for n in weights if cat_map[n] not in over]
+        if free:
+            free_total = sum(weights[n] for n in free)
+            for n in free:
+                weights[n] += excess * (weights[n] / free_total if free_total > 0 else 1.0 / len(free))
+
+        # Renormaliser strictement
         s = sum(weights.values())
         if s > 0:
             weights = {n: w / s for n, w in weights.items()}
 
+    # Vérification finale
+    assert abs(sum(weights.values()) - 1.0) < 0.001, f"Weights sum={sum(weights.values())}"
     return weights
 
 
 # ── Initialisation ────────────────────────────────────────────────────────────
+
+def _validate_price_usd(name: str, price_usd: float, capital: float) -> bool:
+    """
+    Vérifie qu'un prix de conversion USD est plausible.
+    Un prix invalide ferait des unités aberrantes → P&L délirante.
+    """
+    if price_usd <= 0:
+        logger.error("PORTFOLIO SANITY: %s price_usd=%s <= 0, skip", name, price_usd)
+        return False
+    # Les unités ne doivent pas être absurdes (ni > 1M ni < 0.000001)
+    units = capital / price_usd
+    if units > 1_000_000 or units < 1e-8:
+        logger.error(
+            "PORTFOLIO SANITY: %s price_usd=%.6f → units=%.2f hors limites, skip",
+            name, price_usd, units
+        )
+        return False
+    return True
+
 
 def initialize_portfolio(assets: dict) -> dict:
     """Crée le portefeuille initial. Tous les montants sont en USD."""
@@ -213,15 +237,30 @@ def initialize_portfolio(assets: dict) -> dict:
             asset["current"], (asset.get("currency") or "USD"), today, forex
         )
         capital   = INITIAL_CAPITAL * weight
+        if not _validate_price_usd(name, price_usd, capital):
+            continue
         positions[name] = {
-            "units":          capital / price_usd,
+            "units":           round(capital / price_usd, 8),
             "entry_price_usd": round(price_usd, 6),
-            "entry_price_nat": round(asset["current"], 6),   # prix en devise native
-            "currency":       (asset.get("currency") or "USD"),
-            "weight":         round(weight, 4),
-            "signal":         asset.get("claude_score", {}).get("signal", "HOLD"),
-            "capital_usd":    round(capital, 2),
+            "entry_price_nat": round(asset["current"], 6),
+            "currency":        (asset.get("currency") or "USD"),
+            "weight":          round(weight, 4),
+            "signal":          (asset.get("claude_score") or {}).get("signal", "HOLD"),
+            "capital_usd":     round(capital, 2),
         }
+
+    if not positions:
+        logger.error("PORTFOLIO SANITY: aucune position valide — initialisation annulée")
+        return {}
+
+    # Garde-fou : sum(capital_usd) doit être ≈ INITIAL_CAPITAL (±5%)
+    total_cap = sum(p["capital_usd"] for p in positions.values())
+    if not (INITIAL_CAPITAL * 0.50 < total_cap < INITIAL_CAPITAL * 1.50):
+        logger.error(
+            "PORTFOLIO SANITY: sum(capital_usd)=%.2f ≠ initial=%.2f — abandon",
+            total_cap, INITIAL_CAPITAL
+        )
+        return {}
 
     portfolio = {
         "created_at":      datetime.utcnow().isoformat(),
@@ -230,9 +269,9 @@ def initialize_portfolio(assets: dict) -> dict:
         "positions":       positions,
         "history": [{
             "date":        today,
-            "total_value": INITIAL_CAPITAL,
+            "total_value": INITIAL_CAPITAL,   # hardcodé à J0 : toujours 0%
             "return_pct":  0.0,
-            "cash":        INITIAL_CAPITAL - sum(p["capital_usd"] for p in positions.values()),
+            "cash":        round(INITIAL_CAPITAL - total_cap, 2),
         }],
     }
     save_portfolio(portfolio)
@@ -256,9 +295,20 @@ def rebalance_portfolio(portfolio: dict, assets: dict) -> dict:
             price_usd = _to_usd(
                 asset["current"], (pos.get("currency") or "USD"), today, forex
             )
-            current_value += pos["units"] * price_usd
+            # Garde-fou : ignorer si la valorisation est absurde (>10x ou <0.01x l'initial)
+            contrib = pos["units"] * price_usd
+            if 0 < contrib < initial_cap * 50:
+                current_value += contrib
+            else:
+                logger.warning("REBALANCE SANITY: %s contrib=%.2f hors limites, fallback capital", name, contrib)
+                current_value += pos.get("capital_usd", 0)
         else:
-            current_value += pos["capital_usd"]   # fallback
+            current_value += pos.get("capital_usd", 0)
+
+    # Garde-fou global : si la valeur calculée est aberrante, on conserve l'initial
+    if current_value <= 0 or current_value > initial_cap * 20:
+        logger.error("REBALANCE SANITY: current_value=%.2f aberrant → conserve initial_cap=%.2f", current_value, initial_cap)
+        current_value = initial_cap
 
     ret_pct = (current_value - initial_cap) / initial_cap * 100
 
@@ -271,15 +321,21 @@ def rebalance_portfolio(portfolio: dict, assets: dict) -> dict:
             asset["current"], (asset.get("currency") or "USD"), today, forex
         )
         capital = current_value * weight
+        if not _validate_price_usd(name, price_usd, capital):
+            continue
         new_positions[name] = {
-            "units":           capital / price_usd,
+            "units":           round(capital / price_usd, 8),
             "entry_price_usd": round(price_usd, 6),
             "entry_price_nat": round(asset["current"], 6),
             "currency":        (asset.get("currency") or "USD"),
             "weight":          round(weight, 4),
-            "signal":          asset.get("claude_score", {}).get("signal", "HOLD"),
+            "signal":          (asset.get("claude_score") or {}).get("signal", "HOLD"),
             "capital_usd":     round(capital, 2),
         }
+
+    if not new_positions:
+        logger.error("REBALANCE SANITY: aucune position valide — on conserve les anciennes")
+        new_positions = positions
 
     # ── Historique (une entrée par jour) ──────────────────────────────────────
     history = portfolio.get("history", [])
@@ -304,7 +360,7 @@ def rebalance_portfolio(portfolio: dict, assets: dict) -> dict:
 # ── Point d'entrée principal ──────────────────────────────────────────────────
 
 def get_or_update_portfolio(assets: dict) -> dict:
-    """Charge le portefeuille existant et le rééquilibre, ou en crée un nouveau."""
+    """Charge le portefeuille. Rééquilibre au maximum une fois par jour."""
     has_scores = any(a.get("claude_score") for a in assets.values())
     if not has_scores:
         return {}
@@ -312,6 +368,12 @@ def get_or_update_portfolio(assets: dict) -> dict:
     existing = load_portfolio()
     if existing is None:
         return initialize_portfolio(assets)
+
+    # Ne rééquilibre pas si on a déjà une entrée pour aujourd'hui
+    today = date.today().isoformat()
+    history = existing.get("history", [])
+    if history and history[-1].get("date") == today:
+        return existing
 
     # Migration : si l'ancien portefeuille n'a pas le champ currency, recréer
     if "currency" not in existing or "entry_price_usd" not in next(
