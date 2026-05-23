@@ -39,7 +39,7 @@ function ResetPasswordContent() {
   };
 
   if (!token) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ marginLeft: -260 }}>
+    <div className="min-h-[calc(100vh-3.5rem)] lg:min-h-screen flex items-center justify-center">
       <div className="text-center">
         <p className="text-[#ff4757]">Lien invalide.</p>
         <Link href="/forgot-password" className="text-[#00d97e] text-sm mt-2 inline-block">Demander un nouveau lien</Link>
@@ -48,7 +48,7 @@ function ResetPasswordContent() {
   );
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ marginLeft: -260 }}>
+    <div className="min-h-[calc(100vh-3.5rem)] lg:min-h-screen flex items-center justify-center">
       <div className="w-full max-w-sm">
         {done ? (
           <div className="text-center">

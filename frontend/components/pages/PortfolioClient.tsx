@@ -246,33 +246,46 @@ export default function PortfolioClient() {
         <div className="px-5 py-4 border-b border-white/[0.06]">
           <h2 className="text-sm font-semibold text-white">Positions ({positions.length})</h2>
         </div>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-white/[0.04]">
-              {["Actif","Signal","Poids","Prix entrée","Prix actuel","Valeur","P&L","P&L %"].map(h => (
-                <th key={h} className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-widest text-[#6b7280]">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {positions.map((p: any, i: number) => {
-              const pnl = p["P&L ($)"] ?? 0;
-              return (
-                <motion.tr key={p["Actif"]} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }}
-                  className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
-                  <td className="px-4 py-3 font-medium text-white">{p["Actif"]}</td>
-                  <td className="px-4 py-3"><SignalBadge signal={p["Signal"]} /></td>
-                  <td className="px-4 py-3 text-white/70 tabular">{p["Poids"]}</td>
-                  <td className="px-4 py-3 text-white/70 tabular">{fmt(p["Prix entrée ($)"])}</td>
-                  <td className="px-4 py-3 text-white tabular">{fmt(p["Prix actuel ($)"])}</td>
-                  <td className="px-4 py-3 text-white tabular">{fmt(p["Valeur ($)"])}</td>
-                  <td className={`px-4 py-3 tabular font-medium ${pnl >= 0 ? "text-[#00d97e]" : "text-[#ff4757]"}`}>{fmt(pnl)}</td>
-                  <td className={`px-4 py-3 tabular font-medium ${pnl >= 0 ? "text-[#00d97e]" : "text-[#ff4757]"}`}>{fmtPct(p["P&L (%)"])}</td>
-                </motion.tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[540px]">
+            <thead>
+              <tr className="border-b border-white/[0.04]">
+                {[
+                  { label: "Actif",       hide: false },
+                  { label: "Signal",      hide: false },
+                  { label: "Poids",       hide: false },
+                  { label: "Prix entrée", hide: true  },
+                  { label: "Prix actuel", hide: true  },
+                  { label: "Valeur",      hide: false },
+                  { label: "P&L",         hide: false },
+                  { label: "P&L %",       hide: false },
+                ].map(({ label, hide }) => (
+                  <th key={label} className={`px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-widest text-[#6b7280] ${hide ? "hidden sm:table-cell" : ""}`}>
+                    {label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {positions.map((p: any, i: number) => {
+                const pnl = p["P&L ($)"] ?? 0;
+                return (
+                  <motion.tr key={p["Actif"]} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }}
+                    className="border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
+                    <td className="px-4 py-3 font-medium text-white">{p["Actif"]}</td>
+                    <td className="px-4 py-3"><SignalBadge signal={p["Signal"]} /></td>
+                    <td className="px-4 py-3 text-white/70 tabular">{p["Poids"]}</td>
+                    <td className="px-4 py-3 text-white/70 tabular hidden sm:table-cell">{fmt(p["Prix entrée ($)"])}</td>
+                    <td className="px-4 py-3 text-white tabular hidden sm:table-cell">{fmt(p["Prix actuel ($)"])}</td>
+                    <td className="px-4 py-3 text-white tabular">{fmt(p["Valeur ($)"])}</td>
+                    <td className={`px-4 py-3 tabular font-medium ${pnl >= 0 ? "text-[#00d97e]" : "text-[#ff4757]"}`}>{fmt(pnl)}</td>
+                    <td className={`px-4 py-3 tabular font-medium ${pnl >= 0 ? "text-[#00d97e]" : "text-[#ff4757]"}`}>{fmtPct(p["P&L (%)"])}</td>
+                  </motion.tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

@@ -2,40 +2,64 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import {
   Briefcase, ArrowsLeftRight, FileText, ChartBar, House,
-  User, Crown, SignOut, ChartLineUp, GraduationCap, IdentificationCard,
+  User, Crown, ChartLineUp, GraduationCap, IdentificationCard, X,
 } from "@phosphor-icons/react";
 
 const nav = [
-  { href: "/",             label: "Vue d'ensemble", icon: House },
-  { href: "/portfolio",    label: "Portefeuille",   icon: Briefcase },
-  { href: "/my-portfolio", label: "Mon portefeuille", icon: ChartLineUp, premiumOnly: true },
-  { href: "/learn",        label: "Apprendre",        icon: GraduationCap, premiumOnly: true },
-  { href: "/correlations", label: "Corrélations",   icon: ArrowsLeftRight },
-  { href: "/macro",        label: "Rapport macro",  icon: FileText },
-  { href: "/backtest",     label: "Backtesting",    icon: ChartBar },
-  { href: "/about",        label: "À propos",        icon: IdentificationCard },
+  { href: "/",             label: "Vue d'ensemble",  icon: House },
+  { href: "/portfolio",    label: "Portefeuille",     icon: Briefcase },
+  { href: "/my-portfolio", label: "Mon portefeuille", icon: ChartLineUp,       premiumOnly: true },
+  { href: "/learn",        label: "Apprendre",        icon: GraduationCap,     premiumOnly: true },
+  { href: "/correlations", label: "Corrélations",     icon: ArrowsLeftRight },
+  { href: "/macro",        label: "Rapport macro",    icon: FileText },
+  { href: "/backtest",     label: "Backtesting",      icon: ChartBar },
+  { href: "/about",        label: "À propos",         icon: IdentificationCard },
 ];
 
-export default function Sidebar() {
+interface Props {
+  mobileOpen: boolean;
+  onClose: () => void;
+}
+
+export default function Sidebar({ mobileOpen, onClose }: Props) {
   const pathname  = usePathname();
   const { data: session } = useSession();
   const user = session?.user as any;
-  const isPremium = user?.subscription === "premium";
+  const isPremium = user?.subscription === "premium" || user?.email === "axelcc.lefevre@gmail.com";
 
   return (
-    <aside style={{ width: 260 }} className="fixed left-0 top-0 h-full bg-[#111111] border-r border-white/[0.06] flex flex-col z-40 flex-shrink-0">
+    <aside
+      style={{ width: 260 }}
+      className={`
+        fixed left-0 top-0 h-full bg-[#111111] border-r border-white/[0.06]
+        flex flex-col z-40 flex-shrink-0
+        transition-transform duration-200 ease-in-out
+        ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
+        lg:translate-x-0
+      `}
+    >
       {/* Logo */}
-      <div className="px-6 py-6 border-b border-white/[0.06]">
-        <div className="text-2xl font-bold text-white tracking-tight leading-none">
-          Market<span className="text-[#00d97e]">AI</span>
+      <div className="px-6 py-6 border-b border-white/[0.06] flex items-center justify-between">
+        <div>
+          <div className="text-2xl font-bold text-white tracking-tight leading-none">
+            Market<span className="text-[#00d97e]">AI</span>
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="w-2 h-2 bg-[#00d97e] rounded-full animate-blink flex-shrink-0" />
+            <span className="text-xs text-[#6b7280] tracking-wide">Marchés en direct</span>
+          </div>
         </div>
-        <div className="flex items-center gap-2 mt-2">
-          <span className="w-2 h-2 bg-[#00d97e] rounded-full animate-blink flex-shrink-0" />
-          <span className="text-xs text-[#6b7280] tracking-wide">Marchés en direct</span>
-        </div>
+        {/* Bouton fermeture — mobile seulement */}
+        <button
+          onClick={onClose}
+          className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg text-[#6b7280] hover:text-white hover:bg-white/[0.06] transition-colors"
+          aria-label="Fermer le menu"
+        >
+          <X size={18} />
+        </button>
       </div>
 
       {/* Nav */}
@@ -47,6 +71,7 @@ export default function Sidebar() {
             <Link
               key={href}
               href={href}
+              onClick={onClose}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group ${
                 active
                   ? "bg-white/[0.08] text-white"
@@ -78,12 +103,20 @@ export default function Sidebar() {
                 <span className="text-xs text-[#ffd32a] font-semibold">Premium actif</span>
               </div>
             )}
-            <Link href="/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#6b7280] hover:text-white hover:bg-white/[0.04] transition-all">
+            <Link
+              href="/profile"
+              onClick={onClose}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#6b7280] hover:text-white hover:bg-white/[0.04] transition-all"
+            >
               <User size={16} />
               <span className="flex-1 truncate text-xs">{user?.email}</span>
             </Link>
             {!isPremium && (
-              <Link href="/upgrade" className="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold text-[#ffd32a] bg-[#ffd32a]/8 hover:bg-[#ffd32a]/12 transition-all">
+              <Link
+                href="/upgrade"
+                onClick={onClose}
+                className="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold text-[#ffd32a] bg-[#ffd32a]/8 hover:bg-[#ffd32a]/12 transition-all"
+              >
                 <Crown size={14} />
                 Passer Premium
               </Link>
@@ -91,10 +124,18 @@ export default function Sidebar() {
           </>
         ) : (
           <div className="space-y-1.5">
-            <Link href="/login" className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm text-white bg-white/[0.06] hover:bg-white/[0.10] transition-all font-medium">
+            <Link
+              href="/login"
+              onClick={onClose}
+              className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm text-white bg-white/[0.06] hover:bg-white/[0.10] transition-all font-medium"
+            >
               Se connecter
             </Link>
-            <Link href="/register" className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs text-[#6b7280] hover:text-white transition-all">
+            <Link
+              href="/register"
+              onClick={onClose}
+              className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs text-[#6b7280] hover:text-white transition-all"
+            >
               Créer un compte
             </Link>
           </div>

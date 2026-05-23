@@ -22,7 +22,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ marginLeft: -260 }}>
+    <div className="min-h-[calc(100vh-3.5rem)] lg:min-h-screen flex items-center justify-center">
       <div className="w-full max-w-sm">
         <Link href="/login" className="inline-flex items-center gap-1.5 text-sm text-[#6b7280] hover:text-white transition-colors mb-8">
           <ArrowLeft size={14} /> Retour à la connexion

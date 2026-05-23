@@ -155,67 +155,69 @@ export default function OverviewClient() {
 
       {/* Table */}
       <div className="bg-[#111111] border border-white/[0.07] rounded-xl overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-white/[0.06]">
-              {[
-                { key: "name",  label: "Actif" },
-                { key: "cat",   label: "Catégorie" },
-                { key: "price", label: "Prix" },
-                { key: "pct",   label: "Variation" },
-                { key: "rsi",   label: "RSI" },
-                { key: "vol",   label: "Volatilité" },
-                { key: "sig",   label: "Signal" },
-              ].map(({ key, label }) => (
-                <th
-                  key={key}
-                  onClick={() => ["name","price","pct","rsi"].includes(key) && toggleSort(key)}
-                  className={`px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-widest text-[#6b7280] select-none ${
-                    ["name","price","pct","rsi"].includes(key) ? "cursor-pointer hover:text-white" : ""
-                  }`}
-                >
-                  <span className="inline-flex items-center gap-1">
-                    {label} <SortIcon k={key} />
-                  </span>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            <AnimatePresence>
-              {assets.map(([name, a], i) => {
-                const pct = a.pct_change ?? 0;
-                const signal = a.claude_score?.signal ?? "—";
-                return (
-                  <motion.tr
-                    key={name}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: i * 0.02 }}
-                    className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors group"
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[500px]">
+            <thead>
+              <tr className="border-b border-white/[0.06]">
+                {[
+                  { key: "name",  label: "Actif",      hide: false },
+                  { key: "cat",   label: "Catégorie",  hide: true  },
+                  { key: "price", label: "Prix",        hide: false },
+                  { key: "pct",   label: "Variation",   hide: false },
+                  { key: "rsi",   label: "RSI",         hide: true  },
+                  { key: "vol",   label: "Volatilité",  hide: true  },
+                  { key: "sig",   label: "Signal",      hide: false },
+                ].map(({ key, label, hide }) => (
+                  <th
+                    key={key}
+                    onClick={() => ["name","price","pct","rsi"].includes(key) && toggleSort(key)}
+                    className={`px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-widest text-[#6b7280] select-none ${
+                      ["name","price","pct","rsi"].includes(key) ? "cursor-pointer hover:text-white" : ""
+                    } ${hide ? "hidden sm:table-cell" : ""}`}
                   >
-                    <td className="px-4 py-3">
-                      <Link
-                        href={`/asset/${encodeURIComponent(name)}`}
-                        className="font-medium text-white group-hover:text-[#00d97e] transition-colors"
-                      >
-                        {name}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3 text-[#6b7280] text-xs">{a.category}</td>
-                    <td className="px-4 py-3 text-white tabular">{fmt(a.current, 4)}</td>
-                    <td className={`px-4 py-3 tabular font-medium ${pct >= 0 ? "text-[#00d97e]" : "text-[#ff4757]"}`}>
-                      {fmtPct(a.pct_change)}
-                    </td>
-                    <td className="px-4 py-3 text-white/70 tabular">{fmt(a.indicators?.rsi, 1)}</td>
-                    <td className="px-4 py-3 text-white/70 tabular">{fmt(a.indicators?.volatility, 1)}%</td>
-                    <td className="px-4 py-3"><SignalBadge signal={signal} /></td>
-                  </motion.tr>
-                );
-              })}
-            </AnimatePresence>
-          </tbody>
-        </table>
+                    <span className="inline-flex items-center gap-1">
+                      {label} <SortIcon k={key} />
+                    </span>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <AnimatePresence>
+                {assets.map(([name, a], i) => {
+                  const pct = a.pct_change ?? 0;
+                  const signal = a.claude_score?.signal ?? "—";
+                  return (
+                    <motion.tr
+                      key={name}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: i * 0.02 }}
+                      className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors group"
+                    >
+                      <td className="px-4 py-3">
+                        <Link
+                          href={`/asset/${encodeURIComponent(name)}`}
+                          className="font-medium text-white group-hover:text-[#00d97e] transition-colors"
+                        >
+                          {name}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3 text-[#6b7280] text-xs hidden sm:table-cell">{a.category}</td>
+                      <td className="px-4 py-3 text-white tabular">{fmt(a.current, 4)}</td>
+                      <td className={`px-4 py-3 tabular font-medium ${pct >= 0 ? "text-[#00d97e]" : "text-[#ff4757]"}`}>
+                        {fmtPct(a.pct_change)}
+                      </td>
+                      <td className="px-4 py-3 text-white/70 tabular hidden sm:table-cell">{fmt(a.indicators?.rsi, 1)}</td>
+                      <td className="px-4 py-3 text-white/70 tabular hidden sm:table-cell">{fmt(a.indicators?.volatility, 1)}%</td>
+                      <td className="px-4 py-3"><SignalBadge signal={signal} /></td>
+                    </motion.tr>
+                  );
+                })}
+              </AnimatePresence>
+            </tbody>
+          </table>
+        </div>
         {assets.length === 0 && (
           <div className="py-16 text-center text-[#6b7280] text-sm">Aucun actif correspondant.</div>
         )}

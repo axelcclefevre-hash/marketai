@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import Sidebar from "@/components/layout/Sidebar";
+import AppShell from "@/components/layout/AppShell";
 import SessionProvider from "@/components/layout/SessionProvider";
 
 const geistSans = localFont({
@@ -25,12 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="fr" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="flex min-h-screen bg-[#0a0a0a] antialiased">
         <SessionProvider>
-          <Sidebar />
-          <main className="flex-1 min-h-screen" style={{ marginLeft: 260 }}>
-            <div className="max-w-screen-xl mx-auto px-6 py-8">
-              {children}
-            </div>
-          </main>
+          <AppShell>{children}</AppShell>
         </SessionProvider>
       </body>
     </html>
