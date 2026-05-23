@@ -18,7 +18,7 @@
 ### Premium (9,99 €/mois)
 - **Mon portefeuille** — allocation personnalisée générée par IA selon ton profil de risque (questionnaire 5 questions)
 - **Rapport macro** — analyse hebdomadaire des marchés rédigée par Claude (inflation, taux, géopolitique...)
-- **Apprendre à investir** — 7 modules interactifs :
+- **Apprendre à investir** — 7 modules interactifs issus du cours NUS Investment Management :
   1. Les bases de l'investissement
   2. Construire un portefeuille optimal (Markowitz)
   3. Modèles de valorisation — CAPM
@@ -26,6 +26,11 @@
   5. Gestion de portefeuille en pratique
   6. Analyse obligataire
   7. Options, Futures & produits dérivés
+
+### Toutes les pages
+- **Portefeuille simulé** — stratégie d'investissement expliquée + journal quotidien des modifications (actifs ajoutés, supprimés, poids rééquilibrés)
+- **À propos** — page de présentation du projet et de son auteur
+- **Responsive mobile** — sidebar en drawer, top bar hamburger, tables adaptées
 
 ---
 
@@ -50,34 +55,36 @@
 ```
 MarketData/
 ├── api/                    # Backend FastAPI
-│   ├── main.py             # Endpoints : market data, auth, portfolio, stripe
+│   ├── main.py             # Endpoints : market data, auth, portfolio, stripe, admin
 │   ├── models.py           # SQLModel : User, UserPortfolio, PasswordResetToken
-│   ├── auth.py             # JWT, bcrypt, dépendances FastAPI
+│   ├── auth.py             # JWT, bcrypt, ADMIN_EMAILS, effective_subscription()
 │   ├── emails.py           # Resend — emails transactionnels
 │   └── portfolio_user.py   # Génération portefeuille IA selon profil risque
 │
-├── financial_dashboard/    # Logique marché
-│   └── portfolio.py        # Allocation, enrichissement, P&L
+├── financial_dashboard/    # Logique marché (Python pur)
+│   ├── config.py           # Univers d'actifs, modèle Claude, seuils
+│   ├── data_fetcher.py     # yfinance + CoinGecko + FRED
+│   ├── indicators.py       # RSI, MACD, SMA, volatilité
+│   ├── claude_analysis.py  # Scoring BUY/HOLD/SELL via Claude Sonnet
+│   └── portfolio.py        # Allocation signal-driven + changelog quotidien
 │
-└── frontend/               # Next.js app
-    ├── app/                # Pages (App Router)
+└── frontend/               # Next.js 14 (App Router)
+    ├── app/                # Pages
     │   ├── page.tsx        # Vue d'ensemble
-    │   ├── portfolio/      # Portefeuille simulé
+    │   ├── portfolio/      # Portefeuille simulé + stratégie + journal
     │   ├── my-portfolio/   # Portefeuille personnel (Premium)
-    │   ├── learn/          # Modules apprentissage (Premium)
+    │   ├── learn/          # 7 modules apprentissage (Premium)
     │   ├── macro/          # Rapport macro (Premium)
-    │   ├── correlations/
-    │   ├── backtest/
-    │   ├── login/ register/ forgot-password/ reset-password/
-    │   └── upgrade/        # Page abonnement Stripe
+    │   ├── about/          # Page profil / présentation du projet
+    │   ├── correlations/ backtest/ upgrade/ admin/
+    │   └── login/ register/ forgot-password/ reset-password/ profile/
     ├── components/
-    │   ├── layout/         # Sidebar, Header
-    │   ├── auth/           # ProfileClient, PremiumGate
-    │   ├── learn/          # LearnHub, ModuleContent, charts/
-    │   └── ui/             # Composants réutilisables
+    │   ├── layout/         # AppShell (mobile state), Sidebar (drawer)
+    │   ├── learn/          # LearnHub, ModuleContent, 7 graphiques Recharts
+    │   ├── pages/          # Composants client par page
+    │   └── ui/             # PremiumGate, MetricCard, SignalBadge...
     └── lib/
-        ├── learn-content.ts  # Contenu des 7 modules
-        └── market-utils.ts
+        └── learn-content.ts  # Contenu des 7 modules
 ```
 
 ---
