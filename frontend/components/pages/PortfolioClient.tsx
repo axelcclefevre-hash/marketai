@@ -9,10 +9,109 @@ import { fetchPortfolio, fmt, fmtPct } from "@/lib/api";
 
 const COLORS = ["#00d97e","#3b82f6","#ffd32a","#ff4757","#a78bfa","#f97316","#06b6d4","#ec4899","#84cc16","#f59e0b"];
 
+const STRATEGY_BLOCKS = [
+  {
+    title: "Thèse d'investissement",
+    body: "Le portefeuille suit une approche quantitative basée sur les signaux d'analyse de Claude AI. Chaque actif reçoit un signal BUY, HOLD ou SELL assorti d'un score de confiance (0–100 %). Seuls les actifs en signal BUY avec une confiance suffisante entrent dans l'allocation.",
+  },
+  {
+    title: "Univers d'investissement",
+    body: "Actions mondiales (tech, énergie, santé), crypto-monnaies majeures et matières premières. Les indices boursiers, les obligations et les actifs cotés en JPY sont exclus car non directement investissables ou sujets à des biais de conversion.",
+  },
+  {
+    title: "Règles de diversification",
+    body: "Maximum 15 positions simultanées. Aucune catégorie ne peut dépasser 40 % du portefeuille. Limit de 4 actifs par catégorie. En l'absence de signaux BUY, le portefeuille bascule en équipondération sur les actifs éligibles.",
+  },
+  {
+    title: "Rééquilibrage quotidien",
+    body: "Le portefeuille est rééquilibré une fois par jour, automatiquement, au moment du premier appel. La valeur totale est recalculée en USD avant redistribution selon les nouveaux poids cibles. L'historique de chaque modification est conservé 60 jours.",
+  },
+];
+
+function ChangelogEntry({ entry, isLatest }: { entry: any; isLatest: boolean }) {
+  const hasChanges =
+    entry.added?.length > 0 || entry.removed?.length > 0 || entry.reweighted?.length > 0;
+
+  return (
+    <div className={`flex gap-4 pb-5 last:pb-0 relative`}>
+      {/* Timeline line */}
+      <div className="flex flex-col items-center flex-shrink-0">
+        <div
+          className={`w-2.5 h-2.5 rounded-full mt-0.5 flex-shrink-0 ${
+            isLatest ? "bg-[#00d97e] shadow-[0_0_6px_#00d97e]" : "bg-white/20"
+          }`}
+        />
+        <div className="w-px flex-1 bg-white/[0.06] mt-1" />
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-xs font-semibold text-white tabular">
+            {new Date(entry.date).toLocaleDateString("fr-FR", {
+              weekday: "short",
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
+          </span>
+          {isLatest && (
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-[#00d97e] bg-[#00d97e]/10 px-1.5 py-0.5 rounded">
+              Aujourd'hui
+            </span>
+          )}
+        </div>
+
+        <p className="text-xs text-[#6b7280] mb-2 leading-relaxed">{entry.summary}</p>
+
+        {hasChanges && (
+          <div className="space-y-1.5">
+            {entry.added?.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {entry.added.map((name: string) => (
+                  <span
+                    key={name}
+                    className="inline-flex items-center gap-1 text-[10px] font-medium text-[#00d97e] bg-[#00d97e]/10 px-2 py-0.5 rounded-full"
+                  >
+                    + {name}
+                  </span>
+                ))}
+              </div>
+            )}
+            {entry.removed?.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {entry.removed.map((name: string) => (
+                  <span
+                    key={name}
+                    className="inline-flex items-center gap-1 text-[10px] font-medium text-[#ff4757] bg-[#ff4757]/10 px-2 py-0.5 rounded-full"
+                  >
+                    − {name}
+                  </span>
+                ))}
+              </div>
+            )}
+            {entry.reweighted?.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {entry.reweighted.slice(0, 4).map((r: any) => (
+                  <span
+                    key={r.name}
+                    className="text-[10px] font-medium text-[#ffd32a] bg-[#ffd32a]/10 px-2 py-0.5 rounded-full"
+                  >
+                    {r.name} {r.old_pct}%→{r.new_pct}%
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function PortfolioClient() {
-  const [data, setData]     = useState<any>(null);
+  const [data, setData]       = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [range, setRange]   = useState("Max");
+  const [range, setRange]     = useState("Max");
 
   useEffect(() => {
     fetchPortfolio().then(setData).finally(() => setLoading(false));
@@ -23,6 +122,7 @@ export default function PortfolioClient() {
 
   const port      = data.portfolio ?? {};
   const history   = port.history ?? [];
+  const changelog = (port.changelog ?? []).slice().reverse(); // du plus récent au plus ancien
   const positions = data.positions ?? [];
   const last      = history[history.length - 1] ?? {};
   const initial   = port.initial_capital ?? 10000;
@@ -108,6 +208,36 @@ export default function PortfolioClient() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Stratégie + Changelog */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8">
+        {/* Stratégie — 2/3 de la largeur */}
+        <div className="lg:col-span-2 bg-[#111111] border border-white/[0.07] rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-white mb-5">Stratégie d'investissement</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {STRATEGY_BLOCKS.map((block) => (
+              <div key={block.title} className="bg-white/[0.03] border border-white/[0.05] rounded-lg p-4">
+                <h3 className="text-xs font-semibold text-white mb-2 uppercase tracking-wider">{block.title}</h3>
+                <p className="text-xs text-[#6b7280] leading-relaxed">{block.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Journal des modifications — 1/3 */}
+        <div className="bg-[#111111] border border-white/[0.07] rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-white mb-5">Journal des modifications</h2>
+          {changelog.length === 0 ? (
+            <p className="text-xs text-[#6b7280]">Le journal sera alimenté dès le premier rééquilibrage quotidien.</p>
+          ) : (
+            <div className="overflow-y-auto max-h-[340px] pr-1">
+              {changelog.map((entry: any, i: number) => (
+                <ChangelogEntry key={entry.date} entry={entry} isLatest={i === 0} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

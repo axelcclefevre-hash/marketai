@@ -280,6 +280,48 @@ def initialize_portfolio(assets: dict) -> dict:
 
 # ── Rééquilibrage ─────────────────────────────────────────────────────────────
 
+def _compute_changelog(old_positions: dict, new_positions: dict, today: str) -> dict:
+    """
+    Compare les positions avant/après rééquilibrage et génère un résumé lisible.
+    Seuil de changement de poids : ±3 points de pourcentage.
+    """
+    old_names = set(old_positions)
+    new_names = set(new_positions)
+
+    added   = sorted(new_names - old_names)
+    removed = sorted(old_names - new_names)
+
+    reweighted = []
+    for name in old_names & new_names:
+        old_w = round(old_positions[name].get("weight", 0) * 100, 1)
+        new_w = round(new_positions[name].get("weight", 0) * 100, 1)
+        if abs(new_w - old_w) >= 3.0:
+            reweighted.append({"name": name, "old_pct": old_w, "new_pct": new_w})
+
+    reweighted.sort(key=lambda x: abs(x["new_pct"] - x["old_pct"]), reverse=True)
+
+    parts = []
+    if added:
+        parts.append(f"+{len(added)} position{'s' if len(added) > 1 else ''} ({', '.join(added)})")
+    if removed:
+        parts.append(f"-{len(removed)} position{'s' if len(removed) > 1 else ''} ({', '.join(removed)})")
+    if reweighted:
+        rw_str = ", ".join(
+            f"{r['name']} {r['old_pct']}%→{r['new_pct']}%" for r in reweighted[:3]
+        )
+        parts.append(f"poids ajustés : {rw_str}")
+
+    summary = " · ".join(parts) if parts else "Aucun changement significatif"
+
+    return {
+        "date":        today,
+        "added":       added,
+        "removed":     removed,
+        "reweighted":  reweighted,
+        "summary":     summary,
+    }
+
+
 def rebalance_portfolio(portfolio: dict, assets: dict) -> dict:
     """Rééquilibre et met à jour l'historique. Valorisation en USD."""
     positions   = portfolio.get("positions", {})
@@ -337,6 +379,15 @@ def rebalance_portfolio(portfolio: dict, assets: dict) -> dict:
         logger.error("REBALANCE SANITY: aucune position valide — on conserve les anciennes")
         new_positions = positions
 
+    # ── Changelog quotidien ───────────────────────────────────────────────────
+    changelog = portfolio.get("changelog", [])
+    cl_entry  = _compute_changelog(positions, new_positions, today)
+    if changelog and changelog[-1]["date"] == today:
+        changelog[-1] = cl_entry
+    else:
+        changelog.append(cl_entry)
+    changelog = changelog[-60:]  # Garder 60 jours maximum
+
     # ── Historique (une entrée par jour) ──────────────────────────────────────
     history = portfolio.get("history", [])
     entry   = {"date": today, "total_value": round(current_value, 2),
@@ -352,6 +403,7 @@ def rebalance_portfolio(portfolio: dict, assets: dict) -> dict:
         "currency":        "USD",
         "positions":       new_positions,
         "history":         history,
+        "changelog":       changelog,
     }
     save_portfolio(updated)
     return updated
