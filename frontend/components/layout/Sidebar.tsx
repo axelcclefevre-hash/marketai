@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
   Briefcase, ArrowsLeftRight, FileText, ChartBar, House,
-  User, Crown, SignOut, ChartLineUp, GraduationCap,
+  User, Crown, SignOut, ChartLineUp, GraduationCap, IdentificationCard,
 } from "@phosphor-icons/react";
 
 const nav = [
@@ -16,6 +16,7 @@ const nav = [
   { href: "/correlations", label: "Corrélations",   icon: ArrowsLeftRight },
   { href: "/macro",        label: "Rapport macro",  icon: FileText },
   { href: "/backtest",     label: "Backtesting",    icon: ChartBar },
+  { href: "/about",        label: "À propos",        icon: IdentificationCard },
 ];
 
 export default function Sidebar() {
