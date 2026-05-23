@@ -28,6 +28,7 @@ from models import User, UserPortfolio, PasswordResetToken
 from auth import (
     hash_password, verify_password, create_jwt,
     get_current_user, get_premium_user, get_optional_user,
+    ADMIN_EMAILS, effective_subscription,
 )
 from portfolio_user import generate_user_portfolio, update_portfolio_value, score_from_answers
 from emails import send_welcome, send_premium_confirmation, send_password_reset
@@ -255,8 +256,6 @@ def health():
 
 # ── Admin ─────────────────────────────────────────────────────────────────────
 
-ADMIN_EMAILS = {ADMIN_EMAIL, "axelcc.lefevre@gmail.com"}  # fallback hardcodé
-
 def get_admin_user(user: User = Depends(get_current_user)) -> User:
     if user.email not in ADMIN_EMAILS:
         raise HTTPException(status_code=403, detail="Accès administrateur requis")
@@ -393,8 +392,9 @@ def register(req: RegisterRequest):
         # Email de bienvenue (non bloquant)
         import threading
         threading.Thread(target=send_welcome, args=(user.email,), daemon=True).start()
-        token = create_jwt(user.id, user.email, user.subscription_status)
-        return {"token": token, "user": {"id": user.id, "email": user.email, "subscription": user.subscription_status}}
+        sub = effective_subscription(user)
+        token = create_jwt(user.id, user.email, sub)
+        return {"token": token, "user": {"id": user.id, "email": user.email, "subscription": sub}}
 
 
 @app.post("/api/auth/login")
@@ -403,13 +403,15 @@ def login(req: LoginRequest):
         user = session.exec(select(User).where(User.email == req.email)).first()
         if not user or not verify_password(req.password, user.password_hash):
             raise HTTPException(status_code=401, detail="Email ou mot de passe incorrect")
-        token = create_jwt(user.id, user.email, user.subscription_status)
-        return {"token": token, "user": {"id": user.id, "email": user.email, "subscription": user.subscription_status}}
+        sub = effective_subscription(user)
+        token = create_jwt(user.id, user.email, sub)
+        return {"token": token, "user": {"id": user.id, "email": user.email, "subscription": sub}}
 
 
 @app.get("/api/auth/me")
 def me(user: User = Depends(get_current_user)):
-    return {"id": user.id, "email": user.email, "subscription": user.subscription_status, "subscription_end": user.subscription_end}
+    sub = effective_subscription(user)
+    return {"id": user.id, "email": user.email, "subscription": sub, "subscription_end": user.subscription_end}
 
 
 # ── Portefeuille utilisateur (premium) ───────────────────────────────────────

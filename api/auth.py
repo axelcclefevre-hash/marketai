@@ -17,6 +17,19 @@ JWT_EXPIRE_DAYS = 30
 
 security = HTTPBearer(auto_error=False)
 
+# Comptes admin : accès premium sans abonnement Stripe
+ADMIN_EMAILS: set[str] = {
+    "axelcc.lefevre@gmail.com",
+    *(e for e in [os.getenv("ADMIN_EMAIL", "")] if e),
+}
+
+
+def effective_subscription(user: "User") -> str:
+    """Retourne 'premium' pour les admins même sans abonnement Stripe."""
+    if user.email in ADMIN_EMAILS:
+        return "premium"
+    return user.subscription_status
+
 
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
@@ -57,7 +70,7 @@ def get_current_user(credentials: Optional[HTTPAuthorizationCredentials] = Depen
 
 
 def get_premium_user(user: User = Depends(get_current_user)) -> User:
-    if user.subscription_status != "premium":
+    if effective_subscription(user) != "premium":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Cette fonctionnalité nécessite un abonnement Premium"

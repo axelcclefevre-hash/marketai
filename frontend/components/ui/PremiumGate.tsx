@@ -13,8 +13,10 @@ export default function PremiumGate({ feature, children }: Props) {
   const { data: session, status } = useSession();
   const user = session?.user as any;
 
+  const ADMIN_EMAILS = ["axelcc.lefevre@gmail.com"];
+
   if (status === "loading") return null;
-  if (user?.subscription === "premium") return <>{children}</>;
+  if (user?.subscription === "premium" || ADMIN_EMAILS.includes(user?.email)) return <>{children}</>;
 
   return (
     <div className="bg-[#111111] border border-[#ffd32a]/20 rounded-xl p-10 text-center">
