@@ -46,7 +46,7 @@ def _check_rate_limit(key: str, min_interval_seconds: int) -> bool:
     _rate_limits[key] = now
     return True
 
-from data_fetcher import fetch_all_data, load_cache, cache_is_fresh, save_cache, get_prices_df, fetch_news
+from data_fetcher import fetch_all_data, load_cache, cache_is_fresh, save_cache, get_prices_df, fetch_news, fetch_geopolitical_news
 from indicators import enrich_assets
 from claude_analysis import score_all_assets, generate_macro_report
 from portfolio import get_or_update_portfolio, compute_positions_table
@@ -170,25 +170,32 @@ def get_portfolio():
 
 @app.get("/api/macro-report")
 def get_macro_report(force: bool = False):
-    """Claude-generated macro market commentary with geopolitical news context."""
+    """Claude-generated macro market commentary with economic and geopolitical news."""
     try:
         data = _get_enriched_data()
-        report = data.get("macro_report", "")
-        news   = data.get("news", [])
+        report  = data.get("macro_report", "")
+        news    = data.get("news", [])
+        geo_news = data.get("geo_news", [])
 
         if not news or force:
             news = fetch_news(newsapi_key=NEWSAPI_KEY, guardian_key=GUARDIAN_KEY)
             data["news"] = news
 
+        if not geo_news or force:
+            geo_news = fetch_geopolitical_news(guardian_key=GUARDIAN_KEY)
+            data["geo_news"] = geo_news
+
         if (not report or force) and ANTHROPIC_KEY:
             assets = data.get("assets", {})
-            report = generate_macro_report(assets, ANTHROPIC_KEY, news=news)
+            all_news = news + geo_news
+            report = generate_macro_report(assets, ANTHROPIC_KEY, news=all_news)
             data["macro_report"] = report
             save_cache(data)
 
         return _sanitize({
-            "report": report or "Rapport non disponible — clé ANTHROPIC_API_KEY manquante.",
-            "news":   news,
+            "report":   report or "Rapport non disponible — clé ANTHROPIC_API_KEY manquante.",
+            "news":     news,
+            "geo_news": geo_news,
         })
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

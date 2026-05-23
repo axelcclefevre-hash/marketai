@@ -349,6 +349,70 @@ def fetch_news(newsapi_key: str = "", guardian_key: str = "") -> list[dict]:
     return unique[:16]
 
 
+def fetch_geopolitical_news(guardian_key: str = "") -> list[dict]:
+    """Fetch purely geopolitical headlines from The Guardian and geopolitics RSS feeds."""
+    import re
+    headlines: list[dict] = []
+
+    # ── The Guardian — section world / politics ───────────────────────────────
+    if guardian_key:
+        for query, section in [
+            ("war OR conflict OR sanctions OR diplomacy OR nuclear OR coup OR ceasefire OR invasion", "world"),
+            ("election OR protest OR treaty OR alliance OR military OR crisis", "world"),
+        ]:
+            try:
+                r = requests.get(
+                    "https://content.guardianapis.com/search",
+                    params={
+                        "q": query,
+                        "section": section,
+                        "page-size": 6,
+                        "order-by": "newest",
+                        "api-key": guardian_key,
+                    },
+                    timeout=8,
+                )
+                if r.ok:
+                    for a in r.json().get("response", {}).get("results", []):
+                        headlines.append({
+                            "title": a["webTitle"],
+                            "source": "The Guardian",
+                            "url": a.get("webUrl", ""),
+                            "section": a.get("sectionName", "World"),
+                        })
+            except Exception as e:
+                logger.warning("Guardian geopolitical query failed: %s", e)
+
+    # ── RSS géopolitiques publics ─────────────────────────────────────────────
+    geo_feeds = [
+        ("https://feeds.bbci.co.uk/news/world/rss.xml", "BBC World"),
+        ("https://feeds.reuters.com/reuters/worldNews", "Reuters World"),
+        ("https://rss.cfr.org/rss/all", "Council on Foreign Relations"),
+    ]
+    for feed_url, source_name in geo_feeds:
+        if len(headlines) >= 12:
+            break
+        try:
+            r = requests.get(feed_url, timeout=6, headers={"User-Agent": "Mozilla/5.0"})
+            if r.ok:
+                titles = re.findall(r"<title>(?:<!\[CDATA\[)?(.+?)(?:\]\]>)?</title>", r.text)
+                for t in titles[:4]:
+                    t = t.strip()
+                    if t and len(t) > 20 and source_name not in t:
+                        headlines.append({"title": t, "source": source_name, "url": "", "section": "World"})
+        except Exception as e:
+            logger.warning("Geo RSS %s failed: %s", source_name, e)
+
+    seen = set()
+    unique = []
+    for h in headlines:
+        key = h["title"][:60]
+        if key not in seen:
+            seen.add(key)
+            unique.append(h)
+    return unique[:12]
+
+
 def get_prices_df(assets: dict) -> pd.DataFrame:
     """Construit un DataFrame des séries de clôture pour la matrice de corrélation."""
     series = {}

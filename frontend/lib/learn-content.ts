@@ -7,6 +7,13 @@ export type Section = {
   tip?: string;
 };
 
+export type QuizQuestion = {
+  question: string;
+  options: string[];
+  correct: number;
+  explanation: string;
+};
+
 export type Module = {
   id: string;
   number: number;
@@ -19,6 +26,7 @@ export type Module = {
   color: string;
   sections: Section[];
   keyTakeaways: string[];
+  quiz: QuizQuestion[];
 };
 
 export const MODULES: Module[] = [
@@ -138,6 +146,42 @@ Si l'action monte à 130€, votre gain est de 30€ sur une mise de 50€, soit
       "Les marchés financiers transmettent de l'information, allouent du risque et permettent des échanges inter-temporels",
       "La marge amplifie les gains comme les pertes — à manier avec précaution",
     ],
+    quiz: [
+      {
+        question: "Avec une inflation de 2% par an, la valeur réelle de 10 000 € dans 10 ans est approximativement :",
+        options: ["8 200 €", "9 800 €", "10 200 €", "12 000 €"],
+        correct: 0,
+        explanation: "Avec 2% d'inflation par an, le pouvoir d'achat se réduit de (1 - 0,98^10) ≈ 18%. 10 000 € × 0,82 ≈ 8 200 €.",
+      },
+      {
+        question: "Laquelle de ces mesures reflète le mieux la performance réelle d'un portefeuille sur plusieurs années ?",
+        options: ["Rendement arithmétique", "Rendement géométrique", "Rendement nominal", "Rendement attendu"],
+        correct: 1,
+        explanation: "Le rendement géométrique tient compte de l'effet cumulatif et de la volatilité (drag de la volatilité). Il est toujours inférieur ou égal au rendement arithmétique.",
+      },
+      {
+        question: "Qu'est-ce que le bid-ask spread ?",
+        options: [
+          "L'écart entre le prix d'achat et de vente proposé par le teneur de marché",
+          "L'écart entre le RSI haut et bas d'un titre",
+          "La différence de rendement entre actions et obligations",
+          "Le coût annualisé de l'inflation",
+        ],
+        correct: 0,
+        explanation: "Le bid-ask spread est l'écart entre le prix auquel le teneur de marché achète (bid) et celui auquel il vend (ask). C'est un coût implicite de transaction.",
+      },
+      {
+        question: "L'aversion au risque en finance comportementale signifie :",
+        options: [
+          "Ne jamais investir en actions",
+          "Préférer un résultat certain à un résultat incertain d'espérance identique",
+          "Éviter toute perte en capital quoi qu'il arrive",
+          "Investir uniquement dans l'or et les obligations",
+        ],
+        correct: 1,
+        explanation: "Un investisseur averse au risque préfère un gain certain de 100 € à un pari offrant 50% de chance de gagner 200 € (même espérance). C'est le fondement de la théorie de l'utilité.",
+      },
+    ],
   },
   {
     id: "portefeuille",
@@ -223,6 +267,42 @@ La proportion dépend de l'aversion au risque de l'investisseur, mais pas de la 
       "La frontière efficiente représente les portefeuilles optimaux (maximum rendement pour chaque niveau de risque)",
       "Avec 20-30 actifs peu corrélés, on élimine ~90% du risque spécifique",
       "Tous les investisseurs rationnels combinent un actif sans risque avec le même portefeuille risqué optimal",
+    ],
+    quiz: [
+      {
+        question: "Pour maximiser les bénéfices de la diversification, les actifs d'un portefeuille devraient idéalement avoir une corrélation :",
+        options: ["Proche de +1", "Proche de -1 ou proche de 0", "Exactement égale à 0", "Supérieure à 0,8"],
+        correct: 1,
+        explanation: "Plus la corrélation est faible (proche de 0) ou négative (proche de -1), plus la diversification réduit efficacement le risque du portefeuille. Avec ρ = -1, on peut théoriquement éliminer tout le risque.",
+      },
+      {
+        question: "La frontière efficiente de Markowitz représente :",
+        options: [
+          "Les titres ayant le rendement maximum sur les 5 dernières années",
+          "Les portefeuilles à risque minimum quelle que soit la composition",
+          "Les portefeuilles maximisant le rendement pour chaque niveau de risque donné",
+          "Les actions recommandées par les analystes",
+        ],
+        correct: 2,
+        explanation: "La frontière efficiente est l'ensemble des portefeuilles Pareto-optimaux : aucun autre portefeuille ne peut offrir un rendement supérieur pour le même risque, ou un risque inférieur pour le même rendement.",
+      },
+      {
+        question: "Avec combien d'actifs bien sélectionnés élimine-t-on l'essentiel du risque non-systématique ?",
+        options: ["5 à 10 actifs", "20 à 30 actifs", "50 à 100 actifs", "Plus de 200 actifs"],
+        correct: 1,
+        explanation: "Des études empiriques montrent qu'avec 20-30 actifs peu corrélés, on élimine environ 90% du risque spécifique. Au-delà, les gains marginaux de diversification deviennent négligeables.",
+      },
+      {
+        question: "Selon le théorème de séparation en deux fonds de Markowitz, un investisseur rationnel détient toujours :",
+        options: [
+          "Uniquement l'actif sans risque",
+          "Uniquement le portefeuille de marché",
+          "Une combinaison d'un actif sans risque et d'un portefeuille risqué optimal identique pour tous",
+          "Un portefeuille sur mesure selon ses préférences personnelles",
+        ],
+        correct: 2,
+        explanation: "Tous les investisseurs rationnels détiennent le même portefeuille risqué (point tangent sur la frontière efficiente). Seule la proportion entre cet actif risqué et l'actif sans risque varie selon l'aversion au risque.",
+      },
     ],
   },
   {
@@ -325,6 +405,47 @@ Ce modèle explique environ 90% de la variabilité des rendements de portefeuill
       "Le modèle Fama-French ajoute les facteurs taille et valeur pour mieux expliquer les rendements",
       "Un alpha positif persistant est rare dans les marchés efficaces",
     ],
+    quiz: [
+      {
+        question: "Un titre a un bêta de 1,5. La prime de risque de marché est de 6%. Selon le CAPM, la prime de risque attendue pour ce titre est :",
+        options: ["6%", "7,5%", "9%", "4%"],
+        correct: 2,
+        explanation: "Prime de risque = β × (Rm - Rf) = 1,5 × 6% = 9%. Le CAPM récompense uniquement le risque systématique, proportionnel au bêta.",
+      },
+      {
+        question: "Un actif se situe au-dessus de la Security Market Line (SML). Que peut-on en déduire ?",
+        options: [
+          "L'actif est surévalué, son rendement réalisé est trop élevé",
+          "L'actif est sous-évalué, il offre un alpha positif (opportunité d'achat)",
+          "L'actif est correctement valorisé par le marché",
+          "L'actif est trop risqué pour être investi",
+        ],
+        correct: 1,
+        explanation: "Au-dessus de la SML, l'actif génère un rendement supérieur à ce que son bêta justifie. C'est un alpha positif — il est sous-évalué. Le marché devrait le réévaluer à la hausse.",
+      },
+      {
+        question: "Quelle est la différence principale entre la Capital Market Line (CML) et la Security Market Line (SML) ?",
+        options: [
+          "La CML utilise le bêta comme mesure de risque, la SML utilise l'écart-type",
+          "La CML s'applique aux portefeuilles bien diversifiés (risque total), la SML à tout actif (risque systématique)",
+          "La CML est utilisée en gestion passive, la SML en gestion active",
+          "Il n'y a pas de différence, ce sont deux noms pour le même concept",
+        ],
+        correct: 1,
+        explanation: "La CML utilise σ (risque total) et ne s'applique qu'aux portefeuilles efficients. La SML utilise β (risque systématique) et s'applique à tout actif ou portefeuille, diversifié ou non.",
+      },
+      {
+        question: "Le modèle Fama-French 3 facteurs améliore le CAPM en ajoutant :",
+        options: [
+          "La liquidité et le momentum (12 mois)",
+          "Le facteur taille (SMB) et le facteur valeur (HML)",
+          "La volatilité implicite et les taux de change",
+          "Les dividendes et la croissance des bénéfices",
+        ],
+        correct: 1,
+        explanation: "SMB (Small Minus Big) capte la surperformance historique des petites capitalisations. HML (High Minus Low) capte la surperformance des titres value (faible Price-to-Book). Ces deux facteurs expliquent une part significative des rendements non captés par le bêta.",
+      },
+    ],
   },
   {
     id: "efficience",
@@ -394,6 +515,52 @@ Ce modèle explique environ 90% de la variabilité des rendements de portefeuill
       "Nos biais cognitifs (aversion aux pertes, excès de confiance) sont nos pires ennemis en investissement",
       "La solution : automatiser, diversifier, et ne pas surveiller son portefeuille trop fréquemment",
     ],
+    quiz: [
+      {
+        question: "La forme semi-forte de l'hypothèse d'efficience des marchés (EMH) implique qu'il est impossible de battre le marché en utilisant :",
+        options: [
+          "Des informations internes non publiques",
+          "L'analyse des prix et volumes historiques",
+          "L'analyse fondamentale basée sur les données publiques (bilans, rapports)",
+          "L'intelligence artificielle et le machine learning",
+        ],
+        correct: 2,
+        explanation: "La forme semi-forte stipule que les prix reflètent toutes les informations publiques. Ni l'analyse technique (forme faible) ni l'analyse fondamentale publique (forme semi-forte) ne permettent de générer un alpha persistant.",
+      },
+      {
+        question: "L'effet momentum (les titres récemment performants continuent de surperformer à court terme) est :",
+        options: [
+          "Une preuve que les marchés sont parfaitement efficients",
+          "Une anomalie documentée, difficile à réconcilier avec l'EMH",
+          "Uniquement observé sur les marchés crypto",
+          "Expliqué entièrement par le risque systématique (bêta)",
+        ],
+        correct: 1,
+        explanation: "Le momentum est l'une des anomalies les plus robustes en finance empirique. Documenté sur de nombreux marchés et périodes, il suggère que les marchés ne sont pas parfaitement efficients — peut-être dû à des réactions trop lentes des investisseurs.",
+      },
+      {
+        question: "L'excès de confiance (overconfidence) en finance comportementale conduit les investisseurs à :",
+        options: [
+          "Trop diversifier leur portefeuille",
+          "Sous-estimer les risques, surtrader et générer des frais excessifs",
+          "Préférer systématiquement les obligations aux actions",
+          "Attendre trop longtemps avant d'investir",
+        ],
+        correct: 1,
+        explanation: "Les investisseurs trop confiants pensent avoir des informations ou capacités supérieures. Résultat : ils tradent plus que nécessaire (augmentant les frais), concentrent leur portefeuille, et sous-estiment les risques.",
+      },
+      {
+        question: "Selon les données empiriques sur 20 ans, la stratégie qui performe le mieux en net (après frais) pour l'investisseur particulier est :",
+        options: [
+          "La gestion active par des gérants professionnels",
+          "Le stock-picking basé sur l'analyse fondamentale",
+          "L'investissement passif dans des ETF indiciels à faibles frais",
+          "L'arbitrage statistique (quant trading)",
+        ],
+        correct: 2,
+        explanation: "90% des fonds actifs sous-performent leur indice de référence sur 20 ans après frais. Les ETF indiciels (ex. SPY sur le S&P 500) avec des frais de 0,03%-0,1%/an surpassent la grande majorité des gérants actifs sur longue période.",
+      },
+    ],
   },
   {
     id: "gestion",
@@ -459,6 +626,52 @@ Ce modèle explique environ 90% de la variabilité des rendements de portefeuill
       "Le DCA (investissement mensuel régulier) est psychologiquement et statistiquement efficace",
       "Le rééquilibrage annuel discipline le processus d'investissement et améliore le rendement ajusté du risque",
       "Définissez votre tolérance au drawdown avant d'investir, pas pendant une crise",
+    ],
+    quiz: [
+      {
+        question: "Le ratio de Sharpe d'un portefeuille se calcule comme :",
+        options: [
+          "(Rendement portefeuille - Taux sans risque) / Bêta",
+          "(Rendement portefeuille - Taux sans risque) / Écart-type du portefeuille",
+          "Rendement portefeuille - [Taux sans risque + β × (Rm - Rf)]",
+          "Rendement actif / Rendement de l'indice de référence",
+        ],
+        correct: 1,
+        explanation: "Le ratio de Sharpe = (Rp - Rf) / σp. Il mesure le rendement excédentaire par unité de risque total. Un Sharpe > 1 est généralement considéré comme bon.",
+      },
+      {
+        question: "L'alpha de Jensen d'un portefeuille mesure :",
+        options: [
+          "La volatilité du portefeuille par rapport au marché",
+          "Le rendement excédentaire par rapport au CAPM (surperformance ajustée du risque)",
+          "Le ratio rendement/risque global",
+          "La corrélation entre le portefeuille et son indice de référence",
+        ],
+        correct: 1,
+        explanation: "Alpha de Jensen = Rp - [Rf + β(Rm - Rf)]. Un alpha positif signifie que le portefeuille surperforme ce que son risque systématique (bêta) devrait générer selon le CAPM.",
+      },
+      {
+        question: "Le Dollar-Cost Averaging (DCA) est une stratégie qui consiste à :",
+        options: [
+          "Investir la totalité de son capital en une fois pour maximiser l'exposition",
+          "Investir des montants fixes à intervalles réguliers, quelle que soit la situation du marché",
+          "Acheter uniquement lors des baisses de marché",
+          "Rééquilibrer son portefeuille tous les mois",
+        ],
+        correct: 1,
+        explanation: "Le DCA consiste à investir par exemple 500€/mois automatiquement. Avantages : on achète plus de parts quand les prix sont bas, on évite les biais comportementaux, et on ne cherche pas à timer le marché.",
+      },
+      {
+        question: "Pourquoi le rééquilibrage annuel d'un portefeuille améliore-t-il les rendements à long terme ?",
+        options: [
+          "Il permet de concentrer le portefeuille sur les meilleures positions",
+          "Il force à acheter les actifs qui ont sous-performé (baissé) et vendre ceux qui ont surperformé",
+          "Il réduit les frais de transaction en limitant les opérations",
+          "Il augmente mécaniquement la duration du portefeuille",
+        ],
+        correct: 1,
+        explanation: "Le rééquilibrage force à vendre haut (les actifs surperformants qui dépassent leur allocation cible) et acheter bas (les actifs sous-performants). C'est une discipline mécanique qui exploite la mean-reversion.",
+      },
     ],
   },
   {
@@ -531,6 +744,49 @@ Ce modèle explique environ 90% de la variabilité des rendements de portefeuill
       "La duration modifiée mesure la sensibilité : une D* de 7 signifie -7% de prix pour +1% de taux",
       "Plus la maturité est longue et le coupon faible, plus la duration est élevée",
       "L'immunisation et le bond laddering sont les deux stratégies principales de gestion du risque de taux",
+    ],
+    quiz: [
+      {
+        question: "Quand les taux d'intérêt du marché augmentent de 1%, que se passe-t-il pour le prix d'une obligation existante ?",
+        options: [
+          "Il augmente proportionnellement",
+          "Il reste stable (l'obligation est déjà émise)",
+          "Il baisse, car les flux futurs sont actualisés à un taux plus élevé",
+          "Il varie uniquement si l'obligation est à taux variable",
+        ],
+        correct: 2,
+        explanation: "Le prix d'une obligation est la valeur actualisée de ses flux futurs (coupons + remboursement). Si le taux d'actualisation augmente, la valeur présente de ces flux diminue mécaniquement. C'est la relation inverse prix/taux.",
+      },
+      {
+        question: "Une obligation a une duration modifiée de 6. Si les taux montent de 0,5%, l'impact approximatif sur son prix est :",
+        options: [
+          "Hausse de 3%", "Baisse de 3%", "Hausse de 0,5%", "Baisse de 0,5%"
+        ],
+        correct: 1,
+        explanation: "ΔP/P ≈ -D* × Δy = -6 × 0,5% = -3%. La duration modifiée est un multiplicateur de sensibilité : chaque hausse de taux de 1% entraîne une baisse de prix de D*%.",
+      },
+      {
+        question: "Quelle obligation est la PLUS sensible aux variations de taux d'intérêt ?",
+        options: [
+          "Obligation à coupon élevé (8%) et courte maturité (2 ans)",
+          "Obligation à coupon élevé (8%) et longue maturité (20 ans)",
+          "Obligation à coupon faible (2%) et longue maturité (20 ans)",
+          "Obligation à coupon faible (2%) et courte maturité (2 ans)",
+        ],
+        correct: 2,
+        explanation: "La duration augmente avec la maturité (on attend plus longtemps les flux) et diminue avec le coupon (les coupons élevés ramènent les flux plus tôt). Une obligation à faible coupon et longue maturité a donc la duration maximale.",
+      },
+      {
+        question: "L'immunisation d'un portefeuille obligataire consiste à :",
+        options: [
+          "Acheter uniquement des obligations d'État notées AAA",
+          "Faire correspondre la duration du portefeuille avec l'horizon d'investissement",
+          "Diversifier entre obligations courtes et longues en parts égales",
+          "Couvrir le risque de crédit avec des CDS",
+        ],
+        correct: 1,
+        explanation: "En alignant la duration du portefeuille avec l'horizon d'investissement, on neutralise l'effet des variations de taux : la perte en capital est compensée par le réinvestissement des coupons à un taux plus favorable (et vice versa).",
+      },
     ],
   },
   {
@@ -627,6 +883,47 @@ Ce modèle explique environ 90% de la variabilité des rendements de portefeuill
       "La parité put-call lie mécaniquement les prix des options d'achat et de vente",
       "Black-Scholes révolutionne la valorisation des options en 1973 — basé sur la création d'un portefeuille sans risque",
       "Les futures permettent de couvrir un portefeuille actions ou obligataire avec un ratio de couverture précis",
+    ],
+    quiz: [
+      {
+        question: "Le payoff à l'expiration d'un call de strike X = 100 € sur un actif valant S = 120 € est :",
+        options: ["0 €", "20 €", "-20 €", "120 €"],
+        correct: 1,
+        explanation: "Payoff call = max(S - X, 0) = max(120 - 100, 0) = 20 €. L'acheteur exerce l'option car il peut acheter à 100 € un actif qui vaut 120 €.",
+      },
+      {
+        question: "La parité put-call (S + P = C + X × e^(-rT)) implique que :",
+        options: [
+          "Les puts valent toujours plus que les calls",
+          "On peut répliquer un call en combinant un put, l'actif sous-jacent et un emprunt",
+          "Les calls et puts ont toujours le même prix",
+          "La volatilité implicite est identique pour tous les strikes",
+        ],
+        correct: 1,
+        explanation: "La parité put-call est une relation d'arbitrage : un portefeuille {long put, long actif, emprunt de X × e^(-rT)} a exactement le même payoff qu'un call. Si ce n'était pas le cas, il y aurait une opportunité d'arbitrage.",
+      },
+      {
+        question: "Un investisseur achète simultanément un call et un put sur le même actif, même strike, même maturité (straddle). Cette stratégie est profitable quand :",
+        options: [
+          "L'actif monte modérément",
+          "Le marché reste stable autour du strike",
+          "La volatilité réalisée est forte (forte hausse ou forte baisse)",
+          "Les taux d'intérêt baissent",
+        ],
+        correct: 2,
+        explanation: "Le straddle perd sa prime si le marché reste stable. Il gagne si l'actif s'éloigne suffisamment du strike dans l'une ou l'autre direction pour dépasser le coût des deux primes payées.",
+      },
+      {
+        question: "Le VIX, souvent appelé 'indice de la peur', mesure :",
+        options: [
+          "La volatilité historique réalisée du S&P 500 sur 30 jours",
+          "La volatilité implicite du S&P 500 extraite des prix d'options à 30 jours",
+          "Le momentum baissier du marché américain",
+          "La corrélation entre actions et obligations en période de crise",
+        ],
+        correct: 1,
+        explanation: "Le VIX est calculé à partir des prix des options sur le S&P 500 à environ 30 jours d'échéance. Il mesure ce que le marché 'attend' comme volatilité future — pas ce qui s'est passé. Un VIX > 30 signale une forte incertitude.",
+      },
     ],
   },
 ];

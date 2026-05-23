@@ -3,22 +3,23 @@
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { ArrowsClockwise, ArrowSquareOut } from "@phosphor-icons/react";
+import { ArrowsClockwise, ArrowSquareOut, Globe } from "@phosphor-icons/react";
 
-type NewsItem = { title: string; source: string; url?: string };
+type NewsItem = { title: string; source: string; url?: string; section?: string };
 
 async function fetchMacroFull(force = false) {
   const url = `/api/macro-report${force ? "?force=true" : ""}`;
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error("Failed");
-  return res.json() as Promise<{ report: string; news: NewsItem[] }>;
+  return res.json() as Promise<{ report: string; news: NewsItem[]; geo_news: NewsItem[] }>;
 }
 
 export default function MacroClient() {
-  const [report, setReport]   = useState("");
-  const [news, setNews]       = useState<NewsItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [regen, setRegen]     = useState(false);
+  const [report, setReport]     = useState("");
+  const [news, setNews]         = useState<NewsItem[]>([]);
+  const [geoNews, setGeoNews]   = useState<NewsItem[]>([]);
+  const [loading, setLoading]   = useState(true);
+  const [regen, setRegen]       = useState(false);
 
   const load = async (force = false) => {
     try {
@@ -26,6 +27,7 @@ export default function MacroClient() {
       const d = await fetchMacroFull(force);
       setReport(d.report ?? "");
       setNews(d.news ?? []);
+      setGeoNews(d.geo_news ?? []);
     } finally {
       setLoading(false);
       setRegen(false);
@@ -81,13 +83,13 @@ export default function MacroClient() {
                     <strong className="text-white font-semibold">{children}</strong>
                   ),
                   p: ({ children }) => (
-                    <p className="text-[#b0b0b0] leading-relaxed text-sm mb-4">{children}</p>
+                    <p className="text-[#b0b0b0] leading-relaxed text-base mb-4">{children}</p>
                   ),
                   ul: ({ children }) => (
-                    <ul className="space-y-1.5 mb-4 pl-0">{children}</ul>
+                    <ul className="space-y-2 mb-4 pl-0">{children}</ul>
                   ),
                   li: ({ children }) => (
-                    <li className="text-[#b0b0b0] text-sm leading-relaxed flex gap-2">
+                    <li className="text-[#b0b0b0] text-base leading-relaxed flex gap-2">
                       <span className="text-[#00d97e] mt-1 flex-shrink-0">›</span>
                       <span>{children}</span>
                     </li>
@@ -126,11 +128,49 @@ export default function MacroClient() {
             </div>
           </div>
 
-          {/* Actualités — grille pleine largeur en bas */}
+          {/* Section géopolitique */}
+          {geoNews.length > 0 && (
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Globe size={15} className="text-[#ff4757]" />
+                <p className="text-[10px] font-semibold text-[#6b7280] uppercase tracking-widest">
+                  Actualités géopolitiques
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                {geoNews.map((n, i) => (
+                  <a
+                    key={i}
+                    href={n.url || "#"}
+                    target={n.url ? "_blank" : "_self"}
+                    rel="noopener noreferrer"
+                    className="group bg-[#111111] border border-[#ff4757]/20 hover:border-[#ff4757]/40 rounded-xl p-4 transition-all hover:bg-[#161616]"
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <p className="text-sm text-[#d0d0d0] leading-snug group-hover:text-white transition-colors line-clamp-3">
+                        {n.title}
+                      </p>
+                      {n.url && (
+                        <ArrowSquareOut size={13} className="flex-shrink-0 text-[#6b7280] group-hover:text-[#ff4757] mt-0.5 transition-colors" />
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-[#6b7280] font-medium uppercase tracking-wider">{n.source}</span>
+                      {n.section && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#ff4757]/10 text-[#ff4757]/70 uppercase tracking-wide">{n.section}</span>
+                      )}
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Actualités économiques */}
           {news.length > 0 && (
             <div>
               <p className="text-[10px] font-semibold text-[#6b7280] uppercase tracking-widest mb-4">
-                Actualités utilisées pour l&apos;analyse
+                Actualités économiques & marchés
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {news.map((n, i) => (

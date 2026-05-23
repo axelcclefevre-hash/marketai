@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, ReferenceLine } from "recharts";
+import { ComposedChart, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Bar, ReferenceLine } from "recharts";
 import MetricCard from "@/components/ui/MetricCard";
 import SignalBadge from "@/components/ui/SignalBadge";
 import { fetchMarketData, fmt, fmtPct } from "@/lib/api";
@@ -35,9 +35,9 @@ export default function AssetClient({ assetName }: { assetName: string }) {
 
   const macdData = dates.map((d: string, i: number) => ({
     date: d,
-    macd: ind.macd_series?.[i] ?? null,
+    macd:   ind.macd_series?.[i] ?? null,
     signal: ind.signal_series?.[i] ?? null,
-    hist:   ind.hist_series?.[i] ?? null,
+    hist:   ind.histogram_series?.[i] ?? null,
   }));
 
   const rsiData = dates.map((d: string, i: number) => ({
@@ -89,15 +89,22 @@ export default function AssetClient({ assetName }: { assetName: string }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* MACD */}
         <div className="bg-[#111111] border border-white/[0.07] rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-white mb-4">MACD</h2>
+          <h2 className="text-sm font-semibold text-white mb-1">MACD</h2>
+          <div className="flex items-center gap-4 mb-3 text-[10px] text-[#6b7280]">
+            <span><span className="inline-block w-3 h-0.5 bg-[#00d97e] mr-1 align-middle" />MACD</span>
+            <span><span className="inline-block w-3 h-0.5 bg-[#ffd32a] mr-1 align-middle" />Signal</span>
+            <span><span className="inline-block w-3 h-2 bg-white/20 mr-1 align-middle" />Histogramme</span>
+          </div>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={macdData}>
+            <ComposedChart data={macdData}>
               <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
               <YAxis tick={{ fill: "#6b7280", fontSize: 10 }} tickLine={false} axisLine={false} />
               <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, color: "#f5f5f5", fontSize: 12 }} />
-              <ReferenceLine y={0} stroke="rgba(255,255,255,0.1)" />
-              <Bar dataKey="hist" fill="#00d97e" opacity={0.6} name="Histogramme" />
-            </BarChart>
+              <ReferenceLine y={0} stroke="rgba(255,255,255,0.12)" />
+              <Bar dataKey="hist" name="Histogramme" fill="#ffffff" opacity={0.18} />
+              <Line type="monotone" dataKey="macd"   stroke="#00d97e" strokeWidth={1.5} dot={false} name="MACD" />
+              <Line type="monotone" dataKey="signal" stroke="#ffd32a" strokeWidth={1.5} dot={false} name="Signal" />
+            </ComposedChart>
           </ResponsiveContainer>
         </div>
 
