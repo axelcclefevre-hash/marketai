@@ -22,10 +22,15 @@ def _get_client(api_key: str) -> anthropic.Anthropic:
 
 # ── Rapport macro ─────────────────────────────────────────────────────────────
 
-def generate_macro_report(assets: dict, api_key: str, news: list[dict] | None = None) -> str:
+def generate_macro_report(
+    assets: dict,
+    api_key: str,
+    news: list[dict] | None = None,
+    geo_news: list[dict] | None = None,
+) -> str:
     """
-    Génère un rapport macro structuré en markdown (~400 mots) enrichi
-    avec des actualités géopolitiques/économiques si disponibles.
+    Génère un rapport macro structuré en markdown enrichi avec des actualités
+    économiques et géopolitiques séparées pour un contexte géopolitique approfondi.
     """
     try:
         client = _get_client(api_key)
@@ -51,27 +56,31 @@ def generate_macro_report(assets: dict, api_key: str, news: list[dict] | None = 
         summary = "\n".join(lines)
         today   = datetime.utcnow().strftime("%d/%m/%Y")
 
-        news_block = ""
+        eco_block = ""
         if news:
-            news_block = "\n\nActualités géopolitiques et économiques du jour :\n"
+            eco_block = "\n\nActualités économiques & marchés du jour :\n"
             for n in news:
-                source = n.get("source", "")
-                title  = n.get("title", "")
-                news_block += f"- [{source}] {title}\n"
+                eco_block += f"- [{n.get('source', '')}] {n.get('title', '')}\n"
+
+        geo_block = ""
+        if geo_news:
+            geo_block = "\n\nActualités géopolitiques du jour :\n"
+            for n in geo_news:
+                geo_block += f"- [{n.get('source', '')}] {n.get('title', '')}\n"
 
         prompt = f"""Date : {today}
 
 Données de marché du jour :
 {summary}
-{news_block}
+{eco_block}{geo_block}
 
 En tant qu'analyste macro senior, rédigez un rapport structuré en **markdown** avec exactement ces sections :
 
 ## Tendances de marché
-Commentez les mouvements clés des indices, des matières premières, des devises et des cryptos. Mentionnez les niveaux RSI significatifs et les signaux techniques. Soyez précis sur les chiffres.
+Commentez les mouvements clés des indices, matières premières, devises et cryptos. Mentionnez les niveaux RSI significatifs et les signaux techniques. Soyez précis sur les chiffres. (~100 mots)
 
 ## Contexte géopolitique & économique
-Analysez les actualités du jour et leur impact sur les marchés. Faites des liens directs entre les événements et les mouvements de prix observés. Si aucune actualité n'est fournie, analysez le contexte macro global déduit des mouvements de prix.
+Cette section doit être la plus substantielle du rapport (~200 mots). Commencez par décrire concrètement les événements géopolitiques et économiques du moment en vous appuyant sur les actualités fournies : nommez les conflits, tensions diplomatiques, décisions politiques, crises, élections ou négociations en cours. Expliquez leur logique et leurs enjeux. Ensuite seulement, établissez les liens avec les marchés financiers. L'objectif est qu'un lecteur comprenne CE QUI SE PASSE DANS LE MONDE avant de comprendre l'effet sur les marchés.
 
 ## Risques & Opportunités
 **Risques :** listez 3 risques principaux identifiés.
@@ -80,7 +89,7 @@ Analysez les actualités du jour et leur impact sur les marchés. Faites des lie
 ## Synthèse
 En une phrase concise : quelle est l'orientation probable du marché pour les prochaines 48 heures et quel est le sentiment dominant ?
 
-Utilisez du **gras** pour mettre en évidence les chiffres clés et concepts importants. Environ 400 mots. Soyez factuel, professionnel et perspicace."""
+Utilisez du **gras** pour les chiffres clés et événements importants. Soyez factuel, précis et perspicace."""
 
         message = client.messages.create(
             model=CLAUDE_MODEL,

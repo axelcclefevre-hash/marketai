@@ -187,8 +187,7 @@ def get_macro_report(force: bool = False):
 
         if (not report or force) and ANTHROPIC_KEY:
             assets = data.get("assets", {})
-            all_news = news + geo_news
-            report = generate_macro_report(assets, ANTHROPIC_KEY, news=all_news)
+            report = generate_macro_report(assets, ANTHROPIC_KEY, news=news, geo_news=geo_news)
             data["macro_report"] = report
             save_cache(data)
 

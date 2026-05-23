@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { ArrowsClockwise, ArrowSquareOut, Globe } from "@phosphor-icons/react";
+import { ArrowsClockwise, ArrowSquareOut } from "@phosphor-icons/react";
 
 type NewsItem = { title: string; source: string; url?: string; section?: string };
 
@@ -15,11 +15,10 @@ async function fetchMacroFull(force = false) {
 }
 
 export default function MacroClient() {
-  const [report, setReport]     = useState("");
-  const [news, setNews]         = useState<NewsItem[]>([]);
-  const [geoNews, setGeoNews]   = useState<NewsItem[]>([]);
-  const [loading, setLoading]   = useState(true);
-  const [regen, setRegen]       = useState(false);
+  const [report, setReport]   = useState("");
+  const [news, setNews]       = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [regen, setRegen]     = useState(false);
 
   const load = async (force = false) => {
     try {
@@ -27,7 +26,6 @@ export default function MacroClient() {
       const d = await fetchMacroFull(force);
       setReport(d.report ?? "");
       setNews(d.news ?? []);
-      setGeoNews(d.geo_news ?? []);
     } finally {
       setLoading(false);
       setRegen(false);
@@ -128,49 +126,11 @@ export default function MacroClient() {
             </div>
           </div>
 
-          {/* Section géopolitique */}
-          {geoNews.length > 0 && (
-            <div className="mb-8">
-              <div className="flex items-center gap-2 mb-4">
-                <Globe size={15} className="text-[#ff4757]" />
-                <p className="text-[10px] font-semibold text-[#6b7280] uppercase tracking-widest">
-                  Actualités géopolitiques
-                </p>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                {geoNews.map((n, i) => (
-                  <a
-                    key={i}
-                    href={n.url || "#"}
-                    target={n.url ? "_blank" : "_self"}
-                    rel="noopener noreferrer"
-                    className="group bg-[#111111] border border-[#ff4757]/20 hover:border-[#ff4757]/40 rounded-xl p-4 transition-all hover:bg-[#161616]"
-                  >
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <p className="text-sm text-[#d0d0d0] leading-snug group-hover:text-white transition-colors line-clamp-3">
-                        {n.title}
-                      </p>
-                      {n.url && (
-                        <ArrowSquareOut size={13} className="flex-shrink-0 text-[#6b7280] group-hover:text-[#ff4757] mt-0.5 transition-colors" />
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-[#6b7280] font-medium uppercase tracking-wider">{n.source}</span>
-                      {n.section && (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#ff4757]/10 text-[#ff4757]/70 uppercase tracking-wide">{n.section}</span>
-                      )}
-                    </div>
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Actualités économiques */}
+          {/* Actualités */}
           {news.length > 0 && (
             <div>
               <p className="text-[10px] font-semibold text-[#6b7280] uppercase tracking-widest mb-4">
-                Actualités économiques & marchés
+                Actualités utilisées pour l&apos;analyse
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                 {news.map((n, i) => (
