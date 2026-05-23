@@ -18,7 +18,7 @@
 ### Premium (9,99 €/mois)
 - **Mon portefeuille** — allocation personnalisée générée par IA selon ton profil de risque (questionnaire 5 questions)
 - **Rapport macro** — analyse hebdomadaire des marchés rédigée par Claude (inflation, taux, géopolitique...)
-- **Apprendre à investir** — 7 modules interactifs issus du cours NUS Investment Management :
+- **Apprendre à investir** — 7 modules interactifs :
   1. Les bases de l'investissement
   2. Construire un portefeuille optimal (Markowitz)
   3. Modèles de valorisation — CAPM
@@ -161,7 +161,7 @@ NEXTAUTH_URL=https://marketai.fr
 
 ## Auteur
 
-Développé par **Axel** — [marketai.fr](https://marketai.fr)
+Développé par **Axel Lefèvre** — [marketai.fr](https://marketai.fr)
 
 ---
 
