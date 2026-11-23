@@ -1,19 +1,11 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Fira_Sans, Fira_Code } from "next/font/google";
 import "./globals.css";
 import AppShell from "@/components/layout/AppShell";
 import SessionProvider from "@/components/layout/SessionProvider";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+const sans = Fira_Sans({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-sans", display: "swap" });
+const mono = Fira_Code({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
   title: "MarketAI",
@@ -22,8 +14,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="flex min-h-screen bg-[#0a0a0a] antialiased">
+    <html lang="fr" className={`${sans.variable} ${mono.variable}`}>
+      <body className="flex min-h-screen antialiased">
         <SessionProvider>
           <AppShell>{children}</AppShell>
         </SessionProvider>

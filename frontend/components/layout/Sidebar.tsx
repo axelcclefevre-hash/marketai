@@ -28,13 +28,12 @@ export default function Sidebar({ mobileOpen, onClose }: Props) {
   const pathname  = usePathname();
   const { data: session } = useSession();
   const user = session?.user as any;
-  const isPremium = user?.subscription === "premium" || user?.email === "axelcc.lefevre@gmail.com";
+  const isPremium = user?.subscription === "premium";
 
   return (
     <aside
-      style={{ width: 260 }}
       className={`
-        fixed left-0 top-0 h-full bg-[#111111] border-r border-white/[0.06]
+        fixed left-0 top-0 h-full w-[240px] bg-deep border-r border-border
         flex flex-col z-40 flex-shrink-0
         transition-transform duration-200 ease-in-out
         ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
@@ -42,20 +41,12 @@ export default function Sidebar({ mobileOpen, onClose }: Props) {
       `}
     >
       {/* Logo */}
-      <div className="px-6 py-6 border-b border-white/[0.06] flex items-center justify-between">
-        <div>
-          <div className="text-2xl font-bold text-white tracking-tight leading-none">
-            Market<span className="text-[#00d97e]">AI</span>
-          </div>
-          <div className="flex items-center gap-2 mt-2">
-            <span className="w-2 h-2 bg-[#00d97e] rounded-full animate-blink flex-shrink-0" />
-            <span className="text-xs text-[#6b7280] tracking-wide">Marchés en direct</span>
-          </div>
-        </div>
+      <div className="px-5 h-16 border-b border-border flex items-center justify-between">
+        <div className="text-lg font-medium tracking-tight text-primary">Market<span className="text-buy">AI</span></div>
         {/* Bouton fermeture — mobile seulement */}
         <button
           onClick={onClose}
-          className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg text-[#6b7280] hover:text-white hover:bg-white/[0.06] transition-colors"
+          className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg text-muted hover:text-primary hover:bg-white/[0.06] transition-colors"
           aria-label="Fermer le menu"
         >
           <X size={18} />
@@ -72,21 +63,21 @@ export default function Sidebar({ mobileOpen, onClose }: Props) {
               key={href}
               href={href}
               onClick={onClose}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group ${
+              className={`flex items-center gap-3 px-3 h-9 rounded-lg text-sm transition-colors duration-150 group ${
                 active
-                  ? "bg-white/[0.08] text-white"
+                  ? "bg-surface2 text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
                   : locked
-                  ? "text-[#6b7280]/50 hover:text-[#6b7280]"
-                  : "text-[#6b7280] hover:text-white hover:bg-white/[0.04]"
+                  ? "text-muted hover:text-primary"
+                  : "text-muted hover:text-primary hover:bg-white/[0.04]"
               }`}
             >
               <Icon size={18} weight={active ? "fill" : "regular"} className="flex-shrink-0" />
               <span className="flex-1">{label}</span>
               {premiumOnly && !isPremium && (
-                <Crown size={12} className="text-[#ffd32a]/60" />
+                <span className="text-xs text-muted">Pro</span>
               )}
               {premiumOnly && isPremium && (
-                <span className="text-[9px] font-bold text-[#ffd32a] bg-[#ffd32a]/10 px-1.5 py-0.5 rounded">PRO</span>
+                <span className="text-xs text-buy">Pro</span>
               )}
             </Link>
           );
@@ -94,19 +85,19 @@ export default function Sidebar({ mobileOpen, onClose }: Props) {
       </nav>
 
       {/* Footer — auth */}
-      <div className="border-t border-white/[0.06] p-3 space-y-1">
+      <div className="border-t border-border p-3 space-y-1">
         {session ? (
           <>
             {isPremium && (
               <div className="flex items-center gap-2 px-3 py-2 mb-1">
-                <Crown size={14} className="text-[#ffd32a]" />
-                <span className="text-xs text-[#ffd32a] font-semibold">Premium actif</span>
+                <Crown size={14} className="text-hold" />
+                <span className="text-xs text-hold font-medium">Premium actif</span>
               </div>
             )}
             <Link
               href="/profile"
               onClick={onClose}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#6b7280] hover:text-white hover:bg-white/[0.04] transition-all"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted hover:text-primary hover:bg-white/[0.04] transition-colors"
             >
               <User size={16} />
               <span className="flex-1 truncate text-xs">{user?.email}</span>
@@ -115,7 +106,7 @@ export default function Sidebar({ mobileOpen, onClose }: Props) {
               <Link
                 href="/upgrade"
                 onClick={onClose}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold text-[#ffd32a] bg-[#ffd32a]/8 hover:bg-[#ffd32a]/12 transition-all"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-hold bg-hold/8 hover:bg-hold/12 transition-colors"
               >
                 <Crown size={14} />
                 Passer Premium
@@ -127,14 +118,14 @@ export default function Sidebar({ mobileOpen, onClose }: Props) {
             <Link
               href="/login"
               onClick={onClose}
-              className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm text-white bg-white/[0.06] hover:bg-white/[0.10] transition-all font-medium"
+              className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm text-primary bg-white/[0.06] hover:bg-white/[0.10] transition-colors font-medium"
             >
               Se connecter
             </Link>
             <Link
               href="/register"
               onClick={onClose}
-              className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs text-[#6b7280] hover:text-white transition-all"
+              className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs text-muted hover:text-primary transition-colors"
             >
               Créer un compte
             </Link>

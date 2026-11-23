@@ -7,18 +7,18 @@ const tangent = [{ sigma: 15, ret: 9.0, label: "Portefeuille tangent (optimal)" 
 
 export default function CapitalMarketLine() {
   return (
-    <div className="bg-[#1a1a1a] rounded-xl p-5">
-      <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-1">Capital Market Line (CML)</p>
-      <p className="text-xs text-[#6b7280] mb-4">La CML relie l'actif sans risque au portefeuille optimal · Pente = Ratio de Sharpe</p>
+    <div className="bg-surface2 rounded-xl p-5">
+      <p className="text-xs font-semibold text-muted uppercase tracking-wider mb-1">Capital Market Line (CML)</p>
+      <p className="text-xs text-muted mb-4">La CML relie l'actif sans risque au portefeuille optimal · Pente = Ratio de Sharpe</p>
       <ResponsiveContainer width="100%" height={260}>
         <ComposedChart margin={{ top: 10, right: 20, bottom: 20, left: 10 }}>
-          <XAxis dataKey="sigma" type="number" domain={[0, 30]} tick={{ fill: "#6b7280", fontSize: 10 }} tickLine={false} axisLine={false} label={{ value: "Risque (σ%)", position: "bottom", fill: "#6b7280", fontSize: 11 }} />
-          <YAxis type="number" domain={[0, 16]} tick={{ fill: "#6b7280", fontSize: 10 }} tickLine={false} axisLine={false} label={{ value: "Rendement (%)", angle: -90, position: "insideLeft", fill: "#6b7280", fontSize: 11 }} />
-          <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, color: "#f5f5f5", fontSize: 11 }} />
-          <Line data={cmlData} type="linear" dataKey="ret" stroke="#00d97e" strokeWidth={2} dot={false} name="CML" />
+          <XAxis dataKey="sigma" type="number" domain={[0, 30]} tick={{ fill: "#85858b", fontSize: 10 }} tickLine={false} axisLine={false} label={{ value: "Risque (σ%)", position: "bottom", fill: "#85858b", fontSize: 11 }} />
+          <YAxis type="number" domain={[0, 16]} tick={{ fill: "#85858b", fontSize: 10 }} tickLine={false} axisLine={false} label={{ value: "Rendement (%)", angle: -90, position: "insideLeft", fill: "#85858b", fontSize: 11 }} />
+          <Tooltip contentStyle={{ background: "#232325", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, color: "#ededed", fontSize: 11 }} />
+          <Line data={cmlData} type="linear" dataKey="ret" stroke="#4cc38a" strokeWidth={2} dot={false} name="CML" />
           <Line data={frontier} type="monotone" dataKey="frontRet" stroke="#3b82f6" strokeWidth={1.5} dot={false} strokeDasharray="4 3" name="Frontière efficiente" />
-          <Scatter data={tangent} fill="#ffd32a" shape="circle" dataKey="ret" name="Portefeuille tangent" />
-          <ReferenceLine x={0} y={2} stroke="white" strokeOpacity={0.3} label={{ value: "Rf=2%", fill: "#6b7280", fontSize: 10, position: "right" }} />
+          <Scatter data={tangent} fill="#d9a441" shape="circle" dataKey="ret" name="Portefeuille tangent" />
+          <ReferenceLine x={0} y={2} stroke="white" strokeOpacity={0.3} label={{ value: "Rf=2%", fill: "#85858b", fontSize: 10, position: "right" }} />
         </ComposedChart>
       </ResponsiveContainer>
     </div>

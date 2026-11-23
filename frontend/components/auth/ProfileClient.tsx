@@ -38,51 +38,51 @@ export default function ProfileClient() {
     }
   }, [params, session]);
 
-  if (status === "loading") return <div className="text-[#6b7280] text-sm animate-pulse">Chargement...</div>;
+  if (status === "loading") return <div className="text-muted text-sm animate-pulse">Chargement...</div>;
   if (!session) return null;
 
-  if (confirming) return <div className="text-[#6b7280] text-sm animate-pulse">Vérification du paiement...</div>;
+  if (confirming) return <div className="text-muted text-sm animate-pulse">Vérification du paiement...</div>;
 
   const user = session.user as any;
   const isPremium = user.subscription === "premium";
 
   return (
     <div className="max-w-lg">
-      <h1 className="text-2xl font-bold text-white mb-6">Mon profil</h1>
+      <h1 className="text-2xl font-medium text-primary mb-6">Mon profil</h1>
 
       {activated && (
-        <div className="flex items-center gap-3 bg-[#00d97e]/10 border border-[#00d97e]/20 rounded-xl p-4 mb-5">
-          <CheckCircle size={20} className="text-[#00d97e] flex-shrink-0" />
+        <div className="flex items-center gap-3 bg-buy/10 border border-buy/20 rounded-xl p-4 mb-5">
+          <CheckCircle size={20} className="text-buy flex-shrink-0" />
           <div>
-            <p className="text-sm font-semibold text-white">Premium activé !</p>
-            <p className="text-xs text-[#6b7280]">Toutes les fonctionnalités sont maintenant disponibles.</p>
+            <p className="text-sm font-medium text-primary">Premium activé !</p>
+            <p className="text-xs text-muted">Toutes les fonctionnalités sont maintenant disponibles.</p>
           </div>
         </div>
       )}
 
-      <div className="bg-[#111111] border border-white/[0.07] rounded-xl p-6 space-y-5">
+      <div className="card p-6 space-y-5">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-white/[0.08] rounded-full flex items-center justify-center">
-            <Envelope size={18} className="text-[#6b7280]" />
+            <Envelope size={18} className="text-muted" />
           </div>
           <div>
-            <p className="text-xs text-[#6b7280] uppercase tracking-wider">Email</p>
-            <p className="text-white font-medium text-sm">{user.email}</p>
+            <p className="text-xs text-muted ">Email</p>
+            <p className="text-primary font-medium text-sm">{user.email}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isPremium ? "bg-[#ffd32a]/10" : "bg-white/[0.04]"}`}>
-            <Crown size={18} className={isPremium ? "text-[#ffd32a]" : "text-[#6b7280]"} />
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isPremium ? "bg-hold/10" : "bg-white/[0.04]"}`}>
+            <Crown size={18} className={isPremium ? "text-hold" : "text-muted"} />
           </div>
           <div>
-            <p className="text-xs text-[#6b7280] uppercase tracking-wider">Abonnement</p>
-            <p className={`font-semibold text-sm ${isPremium ? "text-[#ffd32a]" : "text-white"}`}>
+            <p className="text-xs text-muted ">Abonnement</p>
+            <p className={`font-medium text-sm ${isPremium ? "text-hold" : "text-primary"}`}>
               {isPremium ? "Premium" : "Gratuit"}
             </p>
           </div>
           {!isPremium && (
-            <Link href="/upgrade" className="ml-auto px-3 py-1.5 bg-[#00d97e] text-[#0a0a0a] rounded-lg text-xs font-semibold hover:bg-[#00d97e]/90 transition-colors">
+            <Link href="/upgrade" className="ml-auto px-3 py-1.5 bg-buy text-bg rounded-lg text-xs font-medium hover:bg-buy/90 transition-colors">
               Passer Premium
             </Link>
           )}
@@ -91,7 +91,7 @@ export default function ProfileClient() {
 
       <button
         onClick={() => signOut({ callbackUrl: "/" })}
-        className="mt-6 flex items-center gap-2 text-sm text-[#6b7280] hover:text-white transition-colors"
+        className="mt-6 flex items-center gap-2 text-sm text-muted hover:text-primary transition-colors"
       >
         <SignOut size={16} />
         Se déconnecter

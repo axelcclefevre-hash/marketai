@@ -57,7 +57,7 @@ const STACK = [
   { label: "TypeScript", color: "#60a5fa" },
   { label: "Recharts", color: "#a78bfa" },
   { label: "Stripe", color: "#635bff" },
-  { label: "Resend", color: "#00d97e" },
+  { label: "Resend", color: "#4cc38a" },
   { label: "Claude Code", color: "#cc785c" },
   { label: "n8n", color: "#f97316" },
 ];
@@ -79,16 +79,16 @@ export default function AboutPage() {
               priority
             />
           </div>
-          <span className="absolute -bottom-2 -right-2 bg-[#00d97e] text-[#0a0a0a] text-[11px] font-bold px-2 py-0.5 rounded-full">
+          <span className="absolute -bottom-2 -right-2 bg-buy text-bg text-xs font-medium px-2 py-0.5 rounded-full">
             HEC · NUS
           </span>
         </div>
 
         <div className="flex-1 pt-1">
-          <h1 className="text-4xl font-bold text-white tracking-tight leading-none mb-3">
+          <h1 className="text-4xl font-medium text-primary tracking-tight leading-none mb-3">
             Axel Lefèvre
           </h1>
-          <p className="text-[#00d97e] text-base font-medium mb-4">
+          <p className="text-buy text-base font-medium mb-4">
             Étudiant HEC Paris, Exchange NUS Singapore, Fondateur de MarketAI
           </p>
           <p className="text-[#9ca3af] text-base leading-relaxed">
@@ -98,7 +98,7 @@ export default function AboutPage() {
             href="https://www.linkedin.com/in/axel-lefevre"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 mt-5 text-sm font-medium text-[#6b7280] hover:text-white transition-colors group"
+            className="inline-flex items-center gap-2 mt-5 text-sm font-medium text-muted hover:text-primary transition-colors group"
           >
             <LinkedinLogo size={18} className="text-[#0a66c2]" />
             linkedin.com/in/axel-lefevre
@@ -109,13 +109,13 @@ export default function AboutPage() {
 
       {/* Pourquoi MarketAI */}
       <motion.section {...fade(0.08)} className="mb-14">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-[#6b7280] mb-5">
+        <h2 className="text-sm font-medium text-muted mb-5">
           Pourquoi MarketAI ?
         </h2>
-        <div className="bg-[#111111] border border-white/[0.07] rounded-xl p-7 space-y-5">
+        <div className="card p-7 space-y-5">
           <p className="text-base text-[#d1d5db] leading-relaxed">
             En janvier 2026, je m'installe à Singapour pour un semestre d'échange à la{" "}
-            <span className="text-white font-medium">National University of Singapore</span>.
+            <span className="text-primary font-medium">National University of Singapore</span>.
             Au programme : <em>Investment Analysis & Portfolio Management</em>, <em>Financial Markets</em>,
             et <em>Deep Learning & Generative AI in Business</em>. Exactement les deux sujets qui me
             passionnent, mis côte à côte dans le même emploi du temps.
@@ -129,15 +129,15 @@ export default function AboutPage() {
           <p className="text-base text-[#d1d5db] leading-relaxed">
             Ce n'est pas un projet de fin d'études avec un jury à convaincre. C'est un outil que j'utilise
             vraiment, construit avec{" "}
-            <span className="text-white font-medium">Claude Code</span> pendant des soirées à Singapour.
+            <span className="text-primary font-medium">Claude Code</span> pendant des soirées à Singapour.
             Le "Apprendre à investir" reprend le contenu du cours NUS transformé en modules
             interactifs avec des graphiques. Le portefeuille simulé suit une stratégie basée sur
             des signaux IA qui tournent tous les jours. C'est un peu mon lab perso.
           </p>
-          <div className="flex items-start gap-3 bg-[#00d97e]/5 border border-[#00d97e]/15 rounded-lg p-5">
-            <span className="text-[#00d97e] text-xl leading-none mt-0.5">↗</span>
+          <div className="flex items-start gap-3 bg-buy/5 border border-buy/15 rounded-lg p-5">
+            <span className="text-buy text-xl leading-none mt-0.5">↗</span>
             <p className="text-sm text-[#9ca3af] leading-relaxed">
-              <span className="text-[#00d97e] font-semibold">L'objectif :</span>{" "}
+              <span className="text-buy font-medium">L'objectif :</span>{" "}
               rendre l'analyse financière accessible à quelqu'un qui débute, sans sacrifier la rigueur.
               Pas de prédictions magiques, pas de "achetez maintenant", juste des données claires,
               des signaux transparents et des explications honnêtes sur comment ça marche.
@@ -148,7 +148,7 @@ export default function AboutPage() {
 
       {/* Parcours — Formation */}
       <motion.section {...fade(0.14)} className="mb-14">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-[#6b7280] mb-5">
+        <h2 className="text-sm font-medium text-muted mb-5">
           Formation
         </h2>
         <div className="space-y-4">
@@ -157,8 +157,8 @@ export default function AboutPage() {
               key={i}
               className={`rounded-xl p-6 border ${
                 item.highlight
-                  ? "bg-[#00d97e]/5 border-[#00d97e]/20"
-                  : "bg-[#111111] border-white/[0.07]"
+                  ? "bg-buy/5 border-buy/20"
+                  : "bg-surface border-white/[0.07]"
               }`}
             >
               <div className="flex items-start justify-between gap-4 flex-wrap mb-2">
@@ -166,11 +166,11 @@ export default function AboutPage() {
                   <GraduationCap
                     size={18}
                     weight="fill"
-                    className={item.highlight ? "text-[#00d97e]" : "text-[#6b7280]"}
+                    className={item.highlight ? "text-buy" : "text-muted"}
                   />
-                  <span className="text-base font-semibold text-white">{item.place}</span>
+                  <span className="text-base font-medium text-primary">{item.place}</span>
                 </div>
-                <span className="text-sm font-mono text-[#6b7280] flex-shrink-0">{item.period}</span>
+                <span className="text-sm font-mono text-muted flex-shrink-0">{item.period}</span>
               </div>
               <p className="text-sm text-[#9ca3af] leading-relaxed pl-7">{item.desc}</p>
             </div>
@@ -180,7 +180,7 @@ export default function AboutPage() {
 
       {/* Parcours — Expériences */}
       <motion.section {...fade(0.2)} className="mb-14">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-[#6b7280] mb-5">
+        <h2 className="text-sm font-medium text-muted mb-5">
           Expériences
         </h2>
         <div className="space-y-0">
@@ -188,7 +188,7 @@ export default function AboutPage() {
             <div key={i} className="flex gap-4 pb-7 last:pb-0 relative">
               <div className="flex flex-col items-center flex-shrink-0">
                 <div className="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center flex-shrink-0">
-                  <Briefcase size={16} weight="fill" className="text-[#6b7280]" />
+                  <Briefcase size={16} weight="fill" className="text-muted" />
                 </div>
                 {i < EXPERIENCE.length - 1 && (
                   <div className="w-px flex-1 bg-white/[0.05] mt-2" />
@@ -196,11 +196,11 @@ export default function AboutPage() {
               </div>
               <div className="flex-1 pt-1">
                 <div className="flex items-baseline gap-3 flex-wrap mb-1">
-                  <span className="text-base font-semibold text-white">{item.place}</span>
-                  <span className="text-sm font-mono text-[#6b7280]">{item.period}</span>
+                  <span className="text-base font-medium text-primary">{item.place}</span>
+                  <span className="text-sm font-mono text-muted">{item.period}</span>
                 </div>
-                <p className="text-sm font-medium text-[#00d97e] mb-2">{item.role}</p>
-                <p className="text-sm text-[#6b7280] leading-relaxed">{item.desc}</p>
+                <p className="text-sm font-medium text-buy mb-2">{item.role}</p>
+                <p className="text-sm text-muted leading-relaxed">{item.desc}</p>
               </div>
             </div>
           ))}
@@ -209,7 +209,7 @@ export default function AboutPage() {
 
       {/* Stack */}
       <motion.section {...fade(0.26)} className="mb-14">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-[#6b7280] mb-5">
+        <h2 className="text-sm font-medium text-muted mb-5">
           Stack de MarketAI
         </h2>
         <div className="flex flex-wrap gap-2 mb-5">
@@ -223,7 +223,7 @@ export default function AboutPage() {
             </span>
           ))}
         </div>
-        <p className="text-sm text-[#6b7280] leading-relaxed">
+        <p className="text-sm text-muted leading-relaxed">
           Tout le code est écrit avec Claude Code. Le backend tourne sur un VPS Hostinger avec Nginx et systemd,
           le frontend est un Next.js 14 (App Router), et les données de marché sont récupérées via yfinance.
           Pas de magie, juste beaucoup de débogage et quelques nuits tardives à Singapour.
@@ -232,28 +232,28 @@ export default function AboutPage() {
 
       {/* En dehors du code */}
       <motion.section {...fade(0.32)} className="mb-14">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-[#6b7280] mb-5">
+        <h2 className="text-sm font-medium text-muted mb-5">
           En dehors du code
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-[#111111] border border-white/[0.07] rounded-xl p-5">
-            <TennisBall size={22} className="text-[#ffd32a] mb-3" />
-            <h3 className="text-sm font-semibold text-white mb-2">Sport</h3>
-            <p className="text-sm text-[#6b7280] leading-relaxed">
+          <div className="card p-5">
+            <TennisBall size={22} className="text-hold mb-3" />
+            <h3 className="text-sm font-medium text-primary mb-2">Sport</h3>
+            <p className="text-sm text-muted leading-relaxed">
               Tennis et football en compétition. L'un pour la précision, l'autre pour l'esprit d'équipe.
             </p>
           </div>
-          <div className="bg-[#111111] border border-white/[0.07] rounded-xl p-5">
+          <div className="card p-5">
             <Globe size={22} className="text-[#3b82f6] mb-3" />
-            <h3 className="text-sm font-semibold text-white mb-2">Langues</h3>
-            <p className="text-sm text-[#6b7280] leading-relaxed">
+            <h3 className="text-sm font-medium text-primary mb-2">Langues</h3>
+            <p className="text-sm text-muted leading-relaxed">
               Français (natif), Anglais IELTS 8/9, Espagnol (courant), Farsi (bases), Latin (bases).
             </p>
           </div>
-          <div className="bg-[#111111] border border-white/[0.07] rounded-xl p-5">
-            <Code size={22} className="text-[#00d97e] mb-3" />
-            <h3 className="text-sm font-semibold text-white mb-2">Intérêts</h3>
-            <p className="text-sm text-[#6b7280] leading-relaxed">
+          <div className="card p-5">
+            <Code size={22} className="text-buy mb-3" />
+            <h3 className="text-sm font-medium text-primary mb-2">Intérêts</h3>
+            <p className="text-sm text-muted leading-relaxed">
               Géopolitique, IA, Mathématiques. Et apparemment, construire des dashboards financiers à Singapour.
             </p>
           </div>
@@ -262,13 +262,13 @@ export default function AboutPage() {
 
       {/* Contact */}
       <motion.section {...fade(0.38)}>
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-[#6b7280] mb-5">
+        <h2 className="text-sm font-medium text-muted mb-5">
           Contact
         </h2>
-        <div className="bg-[#111111] border border-white/[0.07] rounded-xl p-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+        <div className="card p-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
           <div>
-            <p className="text-base text-white font-medium mb-1">Une question sur MarketAI ? Une idée ?</p>
-            <p className="text-sm text-[#6b7280]">
+            <p className="text-base text-primary font-medium mb-1">Une question sur MarketAI ? Une idée ?</p>
+            <p className="text-sm text-muted">
               N'hésite pas à me contacter via LinkedIn ou par email.
             </p>
           </div>
@@ -277,14 +277,14 @@ export default function AboutPage() {
               href="https://www.linkedin.com/in/axel-lefevre"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-lg text-sm font-semibold bg-[#0a66c2] text-white hover:bg-[#0a66c2]/90 transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-lg text-sm font-medium bg-[#0a66c2] text-primary hover:bg-[#0a66c2]/90 transition-colors"
             >
               <LinkedinLogo size={16} weight="fill" />
               LinkedIn
             </a>
             <a
               href="mailto:axel.lefevre@hec.edu"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-lg text-sm font-semibold border border-white/[0.08] text-[#6b7280] hover:text-white hover:border-white/[0.15] transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-lg text-sm font-medium border border-white/[0.08] text-muted hover:text-primary hover:border-white/[0.15] transition-colors"
             >
               axel.lefevre@hec.edu
             </a>

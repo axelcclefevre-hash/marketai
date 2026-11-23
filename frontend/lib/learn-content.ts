@@ -39,7 +39,7 @@ export const MODULES: Module[] = [
     level: "Débutant",
     duration: "20 min",
     icon: "House",
-    color: "#00d97e",
+    color: "#4cc38a",
     sections: [
       {
         id: "pourquoi",
@@ -456,7 +456,7 @@ Ce modèle explique environ 90% de la variabilité des rendements de portefeuill
     level: "Intermédiaire",
     duration: "20 min",
     icon: "Brain",
-    color: "#ffd32a",
+    color: "#d9a441",
     sections: [
       {
         id: "emh",
@@ -798,7 +798,7 @@ Ce modèle explique environ 90% de la variabilité des rendements de portefeuill
     level: "Avancé",
     duration: "35 min",
     icon: "ArrowsLeftRight",
-    color: "#ff4757",
+    color: "#e5484d",
     sections: [
       {
         id: "options-bases",

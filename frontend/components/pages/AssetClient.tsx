@@ -18,8 +18,8 @@ export default function AssetClient({ assetName }: { assetName: string }) {
     }).finally(() => setLoading(false));
   }, [assetName]);
 
-  if (loading) return <div className="flex items-center justify-center h-96 text-[#6b7280] text-sm animate-pulse">Chargement...</div>;
-  if (!asset)  return <div className="text-[#ff4757] text-sm">Actif introuvable : {assetName}</div>;
+  if (loading) return <div className="flex items-center justify-center h-96 text-muted text-sm animate-pulse">Chargement...</div>;
+  if (!asset)  return <div className="text-sell text-sm">Actif introuvable : {assetName}</div>;
 
   const ind    = asset.indicators ?? {};
   const score  = asset.claude_score ?? {};
@@ -48,18 +48,18 @@ export default function AssetClient({ assetName }: { assetName: string }) {
   return (
     <div>
       <div className="mb-6">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-[#6b7280] hover:text-white transition-colors mb-4">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-primary transition-colors mb-4">
           <ArrowLeft size={14} /> Vue d&apos;ensemble
         </Link>
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="font-serif italic text-3xl font-bold text-white tracking-tight leading-none">{assetName}</h1>
-            <p className="text-[#6b7280] text-sm mt-1">{asset.category} · {asset.currency}</p>
+            <h1 className="text-2xl font-medium text-primary tracking-tight">{assetName}</h1>
+            <p className="text-muted text-sm mt-1">{asset.category} · {asset.currency}</p>
           </div>
           <SignalBadge signal={score.signal ?? "—"} />
         </div>
         {score.rationale && (
-          <p className="text-[#6b7280] text-sm mt-3 italic border-l-2 border-white/10 pl-3">{score.rationale}</p>
+          <p className="text-muted text-sm mt-3 italic border-l-2 border-white/10 pl-3">{score.rationale}</p>
         )}
       </div>
 
@@ -72,53 +72,53 @@ export default function AssetClient({ assetName }: { assetName: string }) {
       </div>
 
       {/* Price chart */}
-      <div className="bg-[#111111] border border-white/[0.07] rounded-xl p-5 mb-5">
-        <h2 className="text-sm font-semibold text-white mb-4">Prix & Moyennes mobiles</h2>
+      <div className="card p-5 mb-5">
+        <h2 className="text-sm font-medium text-primary mb-4">Prix & Moyennes mobiles</h2>
         <ResponsiveContainer width="100%" height={260}>
           <LineChart data={chartData}>
-            <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-            <YAxis tick={{ fill: "#6b7280", fontSize: 10 }} tickLine={false} axisLine={false} domain={["auto","auto"]} />
-            <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, color: "#f5f5f5", fontSize: 12 }} />
-            <Line type="monotone" dataKey="price" stroke="#f5f5f5" strokeWidth={1.5} dot={false} name="Prix" />
-            <Line type="monotone" dataKey="sma20"  stroke="#00d97e" strokeWidth={1} dot={false} strokeDasharray="4 2" name="SMA 20" />
-            <Line type="monotone" dataKey="sma50"  stroke="#3b82f6" strokeWidth={1} dot={false} strokeDasharray="4 2" name="SMA 50" />
+            <XAxis dataKey="date" tick={{ fill: "#85858b", fontSize: 12 }} tickFormatter={(d: string) => String(d).slice(5, 10)} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+            <YAxis tick={{ fill: "#85858b", fontSize: 12 }} tickLine={false} axisLine={false} domain={["auto","auto"]} />
+            <Tooltip contentStyle={{ background: "#232325", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, color: "#ededed", fontSize: 12 }} />
+            <Line isAnimationActive={false} type="monotone" dataKey="price" stroke="#ededed" strokeWidth={1.5} dot={false} name="Prix" />
+            <Line isAnimationActive={false} type="monotone" dataKey="sma20"  stroke="#4cc38a" strokeWidth={1} dot={false} strokeDasharray="4 2" name="SMA 20" />
+            <Line isAnimationActive={false} type="monotone" dataKey="sma50"  stroke="#a1a1a6" strokeWidth={1} dot={false} strokeDasharray="4 2" name="SMA 50" />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* MACD */}
-        <div className="bg-[#111111] border border-white/[0.07] rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-white mb-1">MACD</h2>
-          <div className="flex items-center gap-4 mb-3 text-[10px] text-[#6b7280]">
-            <span><span className="inline-block w-3 h-0.5 bg-[#00d97e] mr-1 align-middle" />MACD</span>
-            <span><span className="inline-block w-3 h-0.5 bg-[#ffd32a] mr-1 align-middle" />Signal</span>
+        <div className="card p-5">
+          <h2 className="text-sm font-medium text-primary mb-1">MACD</h2>
+          <div className="flex items-center gap-4 mb-3 text-xs text-muted">
+            <span><span className="inline-block w-3 h-0.5 bg-buy mr-1 align-middle" />MACD</span>
+            <span><span className="inline-block w-3 h-0.5 bg-hold mr-1 align-middle" />Signal</span>
             <span><span className="inline-block w-3 h-2 bg-white/20 mr-1 align-middle" />Histogramme</span>
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <ComposedChart data={macdData}>
-              <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-              <YAxis tick={{ fill: "#6b7280", fontSize: 10 }} tickLine={false} axisLine={false} />
-              <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, color: "#f5f5f5", fontSize: 12 }} />
+              <XAxis dataKey="date" tick={{ fill: "#85858b", fontSize: 12 }} tickFormatter={(d: string) => String(d).slice(5, 10)} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+              <YAxis tick={{ fill: "#85858b", fontSize: 10 }} tickLine={false} axisLine={false} />
+              <Tooltip contentStyle={{ background: "#232325", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, color: "#ededed", fontSize: 12 }} />
               <ReferenceLine y={0} stroke="rgba(255,255,255,0.12)" />
-              <Bar dataKey="hist" name="Histogramme" fill="#ffffff" opacity={0.18} />
-              <Line type="monotone" dataKey="macd"   stroke="#00d97e" strokeWidth={1.5} dot={false} name="MACD" />
-              <Line type="monotone" dataKey="signal" stroke="#ffd32a" strokeWidth={1.5} dot={false} name="Signal" />
+              <Bar isAnimationActive={false} dataKey="hist" name="Histogramme" fill="#ffffff" opacity={0.18} />
+              <Line isAnimationActive={false} type="monotone" dataKey="macd"   stroke="#4cc38a" strokeWidth={1.5} dot={false} name="MACD" />
+              <Line isAnimationActive={false} type="monotone" dataKey="signal" stroke="#d9a441" strokeWidth={1.5} dot={false} name="Signal" />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
 
         {/* RSI */}
-        <div className="bg-[#111111] border border-white/[0.07] rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-white mb-4">RSI (14)</h2>
+        <div className="card p-5">
+          <h2 className="text-sm font-medium text-primary mb-4">RSI (14)</h2>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={rsiData}>
-              <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-              <YAxis domain={[0, 100]} tick={{ fill: "#6b7280", fontSize: 10 }} tickLine={false} axisLine={false} />
-              <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, color: "#f5f5f5", fontSize: 12 }} />
-              <ReferenceLine y={70} stroke="#ff4757" strokeDasharray="4 2" strokeOpacity={0.5} />
-              <ReferenceLine y={30} stroke="#00d97e" strokeDasharray="4 2" strokeOpacity={0.5} />
-              <Line type="monotone" dataKey="rsi" stroke="#ffd32a" strokeWidth={1.5} dot={false} name="RSI" />
+              <XAxis dataKey="date" tick={{ fill: "#85858b", fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+              <YAxis domain={[0, 100]} tick={{ fill: "#85858b", fontSize: 10 }} tickLine={false} axisLine={false} />
+              <Tooltip contentStyle={{ background: "#232325", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, color: "#ededed", fontSize: 12 }} />
+              <ReferenceLine y={70} stroke="#e5484d" strokeDasharray="4 2" strokeOpacity={0.5} />
+              <ReferenceLine y={30} stroke="#4cc38a" strokeDasharray="4 2" strokeOpacity={0.5} />
+              <Line isAnimationActive={false} type="monotone" dataKey="rsi" stroke="#d9a441" strokeWidth={1.5} dot={false} name="RSI" />
             </LineChart>
           </ResponsiveContainer>
         </div>

@@ -41,8 +41,8 @@ function ResetPasswordContent() {
   if (!token) return (
     <div className="min-h-[calc(100vh-3.5rem)] lg:min-h-screen flex items-center justify-center">
       <div className="text-center">
-        <p className="text-[#ff4757]">Lien invalide.</p>
-        <Link href="/forgot-password" className="text-[#00d97e] text-sm mt-2 inline-block">Demander un nouveau lien</Link>
+        <p className="text-sell">Lien invalide.</p>
+        <Link href="/forgot-password" className="text-buy text-sm mt-2 inline-block">Demander un nouveau lien</Link>
       </div>
     </div>
   );
@@ -52,48 +52,48 @@ function ResetPasswordContent() {
       <div className="w-full max-w-sm">
         {done ? (
           <div className="text-center">
-            <CheckCircle size={40} className="text-[#00d97e] mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-white mb-2">Mot de passe mis à jour !</h2>
-            <p className="text-[#6b7280] text-sm">Redirection vers la connexion...</p>
+            <CheckCircle size={40} className="text-buy mx-auto mb-4" />
+            <h2 className="text-xl font-medium text-primary mb-2">Mot de passe mis à jour !</h2>
+            <p className="text-muted text-sm">Redirection vers la connexion...</p>
           </div>
         ) : (
           <>
             <div className="mb-8">
-              <h1 className="text-2xl font-bold text-white">Nouveau mot de passe</h1>
-              <p className="text-[#6b7280] text-sm mt-1">Choisis un mot de passe sécurisé d'au moins 8 caractères.</p>
+              <h1 className="text-2xl font-medium text-primary">Nouveau mot de passe</h1>
+              <p className="text-muted text-sm mt-1">Choisis un mot de passe sécurisé d'au moins 8 caractères.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="text-xs font-medium text-[#6b7280] uppercase tracking-wider">Nouveau mot de passe</label>
+                <label className="text-xs font-medium text-muted ">Nouveau mot de passe</label>
                 <div className="relative mt-1.5">
                   <input
                     type={showPwd ? "text" : "password"}
                     value={password} onChange={e => setPassword(e.target.value)} required
-                    className="w-full bg-[#111111] border border-white/[0.08] rounded-lg px-4 py-3 pr-11 text-white text-sm focus:outline-none focus:border-[#00d97e] transition-colors"
+                    className="w-full bg-surface border border-white/[0.08] rounded-lg px-4 py-3 pr-11 text-primary text-sm focus:outline-none focus:border-buy transition-colors"
                     placeholder="Min. 8 caractères"
                   />
                   <button type="button" onClick={() => setShowPwd(v => !v)} tabIndex={-1}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b7280] hover:text-white transition-colors">
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-primary transition-colors">
                     {showPwd ? <EyeSlash size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-medium text-[#6b7280] uppercase tracking-wider">Confirmer</label>
+                <label className="text-xs font-medium text-muted ">Confirmer</label>
                 <input
                   type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required
-                  className="mt-1.5 w-full bg-[#111111] border border-white/[0.08] rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-[#00d97e] transition-colors"
+                  className="mt-1.5 w-full bg-surface border border-white/[0.08] rounded-lg px-4 py-3 text-primary text-sm focus:outline-none focus:border-buy transition-colors"
                   placeholder="••••••••"
                 />
               </div>
 
-              {error && <p className="text-[#ff4757] text-sm">{error}</p>}
+              {error && <p className="text-sell text-sm">{error}</p>}
 
               <button
                 type="submit" disabled={loading}
-                className="w-full bg-white text-[#0a0a0a] rounded-lg py-3 text-sm font-semibold hover:bg-white/90 active:scale-[0.98] transition-all disabled:opacity-40"
+                className="w-full bg-white text-bg rounded-lg py-3 text-sm font-medium hover:bg-white/90 active:scale-[0.98] transition-colors disabled:opacity-40"
               >
                 {loading ? "Mise à jour..." : "Mettre à jour le mot de passe"}
               </button>
