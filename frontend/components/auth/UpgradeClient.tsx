@@ -54,53 +54,53 @@ export default function UpgradeClient() {
   return (
     <div>
       <div className="mb-10 text-center">
-        <Crown size={32} className="text-[#ffd32a] mx-auto mb-3" />
-        <h1 className="text-3xl font-bold text-white">Choisissez votre plan</h1>
-        <p className="text-[#6b7280] mt-2">Commencez gratuitement, passez Premium quand vous êtes prêt.</p>
+        <Crown size={32} className="text-hold mx-auto mb-3" />
+        <h1 className="text-3xl font-medium text-primary">Choisissez votre plan</h1>
+        <p className="text-muted mt-2">Commencez gratuitement, passez Premium quand vous êtes prêt.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-3xl mx-auto">
         {/* Free */}
-        <div className="bg-[#111111] border border-white/[0.07] rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-white mb-1">Gratuit</h2>
-          <p className="text-3xl font-bold text-white mb-1">0 €<span className="text-sm text-[#6b7280] font-normal">/mois</span></p>
-          <p className="text-xs text-[#6b7280] mb-6">Pour découvrir MarketAI</p>
+        <div className="card p-6">
+          <h2 className="text-lg font-medium text-primary mb-1">Gratuit</h2>
+          <p className="text-3xl font-medium text-primary mb-1">0 €<span className="text-sm text-muted font-normal">/mois</span></p>
+          <p className="text-xs text-muted mb-6">Pour découvrir MarketAI</p>
           <ul className="space-y-2.5 mb-6">
             {FREE_FEATURES.map(f => (
               <li key={f} className="flex items-center gap-2.5 text-sm text-[#a0a0a0]">
-                <Check size={14} className="text-[#00d97e] flex-shrink-0" />{f}
+                <Check size={14} className="text-buy flex-shrink-0" />{f}
               </li>
             ))}
           </ul>
-          <Link href="/" className="block text-center py-2.5 border border-white/[0.08] rounded-lg text-sm text-[#6b7280] hover:text-white transition-colors">
+          <Link href="/" className="block text-center py-2.5 border border-white/[0.08] rounded-lg text-sm text-muted hover:text-primary transition-colors">
             Continuer gratuitement
           </Link>
         </div>
 
         {/* Premium */}
-        <div className="bg-[#111111] border border-[#ffd32a]/30 rounded-xl p-6 relative">
-          <div className="absolute top-4 right-4 px-2 py-0.5 bg-[#ffd32a] text-[#0a0a0a] rounded text-[10px] font-bold uppercase tracking-wider">
+        <div className="bg-surface border border-hold/30 rounded-xl p-6 relative">
+          <div className="absolute top-4 right-4 px-2 py-0.5 bg-hold text-bg rounded text-xs font-medium ">
             Recommandé
           </div>
-          <h2 className="text-lg font-semibold text-white mb-1">Premium</h2>
-          <p className="text-3xl font-bold text-white mb-1">9,99 €<span className="text-sm text-[#6b7280] font-normal">/mois</span></p>
-          <p className="text-xs text-[#6b7280] mb-6">Accès complet à toutes les fonctionnalités</p>
+          <h2 className="text-lg font-medium text-primary mb-1">Premium</h2>
+          <p className="text-3xl font-medium text-primary mb-1">9,99 €<span className="text-sm text-muted font-normal">/mois</span></p>
+          <p className="text-xs text-muted mb-6">Accès complet à toutes les fonctionnalités</p>
           <ul className="space-y-2.5 mb-6">
             {PREMIUM_FEATURES.map(f => (
               <li key={f} className="flex items-center gap-2.5 text-sm text-[#a0a0a0]">
-                <Check size={14} className="text-[#ffd32a] flex-shrink-0" />{f}
+                <Check size={14} className="text-hold flex-shrink-0" />{f}
               </li>
             ))}
           </ul>
-          {error && <p className="text-[#ff4757] text-xs mb-2">{error}</p>}
+          {error && <p className="text-sell text-xs mb-2">{error}</p>}
           {isPremium ? (
-            <div className="text-center py-2.5 bg-[#ffd32a]/10 border border-[#ffd32a]/20 rounded-lg text-sm text-[#ffd32a] font-semibold">
+            <div className="text-center py-2.5 bg-hold/10 border border-hold/20 rounded-lg text-sm text-hold font-medium">
               Déjà Premium
             </div>
           ) : (
             <button
               onClick={handleCheckout} disabled={loading}
-              className="w-full py-2.5 bg-[#ffd32a] text-[#0a0a0a] rounded-lg text-sm font-semibold hover:bg-[#ffd32a]/90 active:scale-[0.98] transition-all disabled:opacity-40"
+              className="w-full py-2.5 bg-hold text-bg rounded-lg text-sm font-medium hover:bg-hold/90 active:scale-[0.98] transition-colors disabled:opacity-40"
             >
               {loading ? "Redirection..." : session ? "S'abonner maintenant" : "Créer un compte"}
             </button>

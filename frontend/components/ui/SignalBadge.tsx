@@ -1,12 +1,16 @@
+// Signature MarketAI : une pastille de statut + le libellé, jamais une pilule colorée.
+const MAP: Record<string, { dot: string; label: string }> = {
+  BUY:  { dot: "bg-buy",  label: "Achat" },
+  SELL: { dot: "bg-sell", label: "Vente" },
+  HOLD: { dot: "bg-hold", label: "Conserver" },
+};
+
 export default function SignalBadge({ signal }: { signal: string }) {
-  const map: Record<string, { bg: string; text: string; label: string }> = {
-    BUY:  { bg: "bg-[#00d97e]/10 border-[#00d97e]/20", text: "text-[#00d97e]", label: "ACHAT" },
-    SELL: { bg: "bg-[#ff4757]/10 border-[#ff4757]/20", text: "text-[#ff4757]", label: "VENTE" },
-    HOLD: { bg: "bg-[#ffd32a]/10 border-[#ffd32a]/20", text: "text-[#ffd32a]", label: "CONSERVER" },
-  };
-  const s = map[signal] ?? { bg: "bg-white/5 border-white/10", text: "text-[#6b7280]", label: signal || "—" };
+  const s = MAP[signal];
+  if (!s) return <span className="text-muted">—</span>;
   return (
-    <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-semibold tracking-widest border tabular ${s.bg} ${s.text}`}>
+    <span className="inline-flex items-center gap-2 text-[13px] text-primary">
+      <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} aria-hidden />
       {s.label}
     </span>
   );

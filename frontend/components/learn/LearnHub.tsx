@@ -7,9 +7,9 @@ import PremiumGate from "@/components/ui/PremiumGate";
 import { BookOpen, Clock, Star } from "@phosphor-icons/react";
 
 const LEVEL_COLOR: Record<string, string> = {
-  "Débutant":      "text-[#00d97e] bg-[#00d97e]/10 border-[#00d97e]/20",
-  "Intermédiaire": "text-[#ffd32a] bg-[#ffd32a]/10 border-[#ffd32a]/20",
-  "Avancé":        "text-[#ff4757] bg-[#ff4757]/10 border-[#ff4757]/20",
+  "Débutant":      "text-buy bg-buy/10 border-buy/20",
+  "Intermédiaire": "text-hold bg-hold/10 border-hold/20",
+  "Avancé":        "text-sell bg-sell/10 border-sell/20",
 };
 
 function HubContent() {
@@ -17,14 +17,14 @@ function HubContent() {
     <div>
       <div className="mb-10">
         <div className="flex items-center gap-3 mb-3">
-          <BookOpen size={28} className="text-[#00d97e]" />
+          <BookOpen size={28} className="text-buy" />
           <h1 className="text-3xl font-bold text-white">Apprendre à investir</h1>
         </div>
-        <p className="text-[#6b7280] max-w-2xl leading-relaxed">
+        <p className="text-muted max-w-2xl leading-relaxed">
           7 modules complets basés sur un cours universitaire d'Investment Management.
           Des fondamentaux aux produits dérivés — avec graphiques interactifs et formules clés.
         </p>
-        <div className="flex gap-4 mt-4 text-sm text-[#6b7280]">
+        <div className="flex gap-4 mt-4 text-sm text-muted">
           <span className="flex items-center gap-1"><BookOpen size={14} /> 7 modules</span>
           <span className="flex items-center gap-1"><Clock size={14} /> ~3h de contenu</span>
           <span className="flex items-center gap-1"><Star size={14} /> Niveau Débutant → Avancé</span>
@@ -35,7 +35,7 @@ function HubContent() {
         {MODULES.map((mod, i) => (
           <Link key={mod.id} href={`/learn/${mod.id}`}>
             <div
-              className="group bg-[#111111] border border-white/[0.07] hover:border-white/[0.15] rounded-xl p-6 h-full transition-all hover:bg-[#161616] cursor-pointer"
+              className="group bg-surface border border-white/[0.07] hover:border-white/[0.15] rounded-xl p-6 h-full transition-all hover:bg-[#161616] cursor-pointer"
               style={{ animationDelay: `${i * 60}ms` }}
             >
               <div className="flex items-start justify-between mb-4">
@@ -50,12 +50,12 @@ function HubContent() {
                 </span>
               </div>
 
-              <h2 className="text-base font-semibold text-white mb-1 group-hover:text-[#00d97e] transition-colors">
+              <h2 className="text-base font-semibold text-white mb-1 group-hover:text-buy transition-colors">
                 {mod.title}
               </h2>
-              <p className="text-xs text-[#6b7280] mb-4 leading-relaxed">{mod.description}</p>
+              <p className="text-xs text-muted mb-4 leading-relaxed">{mod.description}</p>
 
-              <div className="flex items-center justify-between text-xs text-[#6b7280]">
+              <div className="flex items-center justify-between text-xs text-muted">
                 <span className="flex items-center gap-1"><Clock size={12} /> {mod.duration}</span>
                 <span className="flex items-center gap-1">{mod.sections.length} sections</span>
               </div>

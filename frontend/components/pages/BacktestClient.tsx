@@ -72,26 +72,26 @@ export default function BacktestClient() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="font-serif italic text-3xl font-bold text-white tracking-tight leading-none">Backtesting</h1>
-        <p className="text-[#6b7280] text-sm mt-1.5">Simulation de stratégies techniques</p>
+        <h1 className="text-2xl font-medium text-primary tracking-tight">Backtesting</h1>
+        <p className="text-muted text-sm mt-1.5">Simulation de stratégies techniques</p>
       </div>
 
       {/* Controls */}
       <div className="flex flex-wrap gap-3 mb-6">
         <select value={asset} onChange={e => setAsset(e.target.value)}
-          className="bg-[#111111] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-white/20">
+          className="bg-surface border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-primary focus:outline-none focus:border-white/20">
           {assets.map(a => <option key={a} value={a}>{a}</option>)}
         </select>
         <select value={strategy} onChange={e => setStrategy(e.target.value)}
-          className="bg-[#111111] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-white/20">
+          className="bg-surface border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-primary focus:outline-none focus:border-white/20">
           {STRATEGIES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
         </select>
         <select value={period} onChange={e => setPeriod(Number(e.target.value))}
-          className="bg-[#111111] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-white/20">
+          className="bg-surface border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-primary focus:outline-none focus:border-white/20">
           {PERIODS.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
         </select>
         <button onClick={handleRun} disabled={running || loading}
-          className="px-5 py-2 bg-white text-[#0a0a0a] rounded-lg text-sm font-semibold hover:bg-white/90 active:scale-[0.97] transition-all disabled:opacity-40">
+          className="px-5 py-2 bg-white text-bg rounded-lg text-sm font-medium hover:bg-white/90 active:scale-[0.97] transition-colors disabled:opacity-40">
           {running ? "En cours..." : "Lancer"}
         </button>
       </div>
@@ -108,34 +108,34 @@ export default function BacktestClient() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
-            <div className="bg-[#111111] border border-white/[0.07] rounded-xl p-5">
-              <h2 className="text-sm font-semibold text-white mb-4">Performance normalisée (base 100)</h2>
+            <div className="card p-5">
+              <h2 className="text-sm font-medium text-primary mb-4">Performance normalisée (base 100)</h2>
               <ResponsiveContainer width="100%" height={240}>
                 <LineChart data={chartData} margin={{ bottom: 28, left: 4, right: 8 }}>
-                  <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-                  <YAxis tick={{ fill: "#6b7280", fontSize: 10 }} tickLine={false} axisLine={false} domain={["auto", "auto"]} />
-                  <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, color: "#f5f5f5", fontSize: 12 }} />
+                  <XAxis dataKey="date" tick={{ fill: "#85858b", fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+                  <YAxis tick={{ fill: "#85858b", fontSize: 10 }} tickLine={false} axisLine={false} domain={["auto", "auto"]} />
+                  <Tooltip contentStyle={{ background: "#232325", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, color: "#ededed", fontSize: 12 }} />
                   <ReferenceLine y={100} stroke="rgba(255,255,255,0.1)" strokeDasharray="4 4" />
-                  <Line type="monotone" dataKey="strategy" stroke="#00d97e" strokeWidth={2} dot={false} name="Stratégie" />
-                  <Line type="monotone" dataKey="benchmark" stroke="#6b7280" strokeWidth={1.5} dot={false} strokeDasharray="4 4" name="Buy & Hold" />
+                  <Line isAnimationActive={false} type="monotone" dataKey="strategy" stroke="#4cc38a" strokeWidth={2} dot={false} name="Stratégie" />
+                  <Line isAnimationActive={false} type="monotone" dataKey="benchmark" stroke="#85858b" strokeWidth={1.5} dot={false} strokeDasharray="4 4" name="Buy & Hold" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
 
-            <div className="bg-[#111111] border border-white/[0.07] rounded-xl p-5">
-              <h2 className="text-sm font-semibold text-white mb-4">Drawdown</h2>
+            <div className="card p-5">
+              <h2 className="text-sm font-medium text-primary mb-4">Drawdown</h2>
               <ResponsiveContainer width="100%" height={240}>
                 <AreaChart data={ddData} margin={{ bottom: 28, left: 4, right: 8 }}>
                   <defs>
                     <linearGradient id="ddGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ff4757" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#ff4757" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#e5484d" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#e5484d" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="date" tick={{ fill: "#6b7280", fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-                  <YAxis tick={{ fill: "#6b7280", fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={v => `${v.toFixed(0)}%`} domain={["auto", 2]} />
-                  <Tooltip contentStyle={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, color: "#f5f5f5", fontSize: 12 }} formatter={(v: any) => [`${Number(v).toFixed(2)}%`, "Drawdown"]} />
-                  <Area type="monotone" dataKey="drawdown" stroke="#ff4757" strokeWidth={1.5} fill="url(#ddGrad)" dot={false} />
+                  <XAxis dataKey="date" tick={{ fill: "#85858b", fontSize: 10 }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
+                  <YAxis tick={{ fill: "#85858b", fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={v => `${v.toFixed(0)}%`} domain={["auto", 2]} />
+                  <Tooltip contentStyle={{ background: "#232325", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, color: "#ededed", fontSize: 12 }} formatter={(v: any) => [`${Number(v).toFixed(2)}%`, "Drawdown"]} />
+                  <Area isAnimationActive={false} type="monotone" dataKey="drawdown" stroke="#e5484d" strokeWidth={1.5} fill="url(#ddGrad)" dot={false} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -146,14 +146,14 @@ export default function BacktestClient() {
       {!result && !running && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { name: "SMA Crossover", desc: "Croise les moyennes mobiles courte et longue pour détecter les tendances. Achat quand la SMA courte passe au-dessus de la longue.", color: "#00d97e" },
+            { name: "SMA Crossover", desc: "Croise les moyennes mobiles courte et longue pour détecter les tendances. Achat quand la SMA courte passe au-dessus de la longue.", color: "#4cc38a" },
             { name: "RSI Mean Reversion", desc: "Achète en zone de survente (RSI < 30) et vend en zone de surachat (RSI > 70). Idéal pour les marchés oscillants.", color: "#3b82f6" },
-            { name: "MACD Signal", desc: "Suit les croisements entre la ligne MACD et sa ligne de signal pour anticiper les retournements de tendance.", color: "#ffd32a" },
+            { name: "MACD Signal", desc: "Suit les croisements entre la ligne MACD et sa ligne de signal pour anticiper les retournements de tendance.", color: "#d9a441" },
           ].map(s => (
-            <div key={s.name} className="bg-[#111111] border border-white/[0.07] rounded-xl p-6">
+            <div key={s.name} className="card p-6">
               <div className="w-2 h-2 rounded-full mb-3" style={{ background: s.color }} />
-              <h3 className="text-sm font-semibold text-white mb-2">{s.name}</h3>
-              <p className="text-xs text-[#6b7280] leading-relaxed">{s.desc}</p>
+              <h3 className="text-sm font-medium text-primary mb-2">{s.name}</h3>
+              <p className="text-xs text-muted leading-relaxed">{s.desc}</p>
             </div>
           ))}
         </div>

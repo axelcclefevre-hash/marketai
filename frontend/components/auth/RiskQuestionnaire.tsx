@@ -27,9 +27,9 @@ const QUESTIONS = [
 
 const PROFILES: Record<string, { label: string; color: string; desc: string }> = {
   conservateur: { label: "Conservateur", color: "#3b82f6", desc: "Stabilité avant tout. Capital protégé avec des rendements modérés." },
-  equilibre:    { label: "Équilibré",    color: "#00d97e", desc: "Le meilleur des deux mondes : croissance et protection." },
-  croissance:   { label: "Croissance",   color: "#ffd32a", desc: "Rendements élevés avec une volatilité acceptée." },
-  agressif:     { label: "Agressif",     color: "#ff4757", desc: "Maximisation des gains, risque élevé assumé." },
+  equilibre:    { label: "Équilibré",    color: "#4cc38a", desc: "Le meilleur des deux mondes : croissance et protection." },
+  croissance:   { label: "Croissance",   color: "#d9a441", desc: "Rendements élevés avec une volatilité acceptée." },
+  agressif:     { label: "Agressif",     color: "#e5484d", desc: "Maximisation des gains, risque élevé assumé." },
 };
 
 interface Props {
@@ -66,13 +66,13 @@ export default function RiskQuestionnaire({ onComplete }: Props) {
     return (
       <div className="text-center max-w-sm mx-auto">
         <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: `${p.color}20`, border: `2px solid ${p.color}40` }}>
-          <span className="text-2xl font-bold" style={{ color: p.color }}>{p.label[0]}</span>
+          <span className="text-2xl font-medium" style={{ color: p.color }}>{p.label[0]}</span>
         </div>
-        <h3 className="text-xl font-bold text-white mb-2">Profil : {p.label}</h3>
-        <p className="text-sm text-[#6b7280] mb-6">{p.desc}</p>
+        <h3 className="text-xl font-medium text-primary mb-2">Profil : {p.label}</h3>
+        <p className="text-sm text-muted mb-6">{p.desc}</p>
         <button
           onClick={() => onComplete(result)}
-          className="w-full py-3 bg-white text-[#0a0a0a] rounded-lg text-sm font-semibold hover:bg-white/90 transition-colors"
+          className="w-full py-3 bg-white text-bg rounded-lg text-sm font-medium hover:bg-white/90 transition-colors"
         >
           Générer mon portefeuille
         </button>
@@ -85,17 +85,17 @@ export default function RiskQuestionnaire({ onComplete }: Props) {
     <div className="max-w-md">
       <div className="flex gap-1 mb-6">
         {QUESTIONS.map((_, i) => (
-          <div key={i} className={`h-1 flex-1 rounded-full ${i <= current ? "bg-[#00d97e]" : "bg-white/[0.08]"}`} />
+          <div key={i} className={`h-1 flex-1 rounded-full ${i <= current ? "bg-buy" : "bg-white/[0.08]"}`} />
         ))}
       </div>
-      <p className="text-xs text-[#6b7280] uppercase tracking-wider mb-2">Question {current + 1}/{QUESTIONS.length}</p>
-      <h3 className="text-lg font-semibold text-white mb-5">{q.text}</h3>
+      <p className="text-xs text-muted mb-2">Question {current + 1}/{QUESTIONS.length}</p>
+      <h3 className="text-lg font-medium text-primary mb-5">{q.text}</h3>
       <div className="space-y-2.5">
         {q.options.map((opt, i) => (
           <button
             key={i}
             onClick={() => handleAnswer(i)}
-            className="w-full text-left px-4 py-3 bg-[#111111] border border-white/[0.07] hover:border-[#00d97e]/40 hover:bg-[#00d97e]/5 rounded-lg text-sm text-[#a0a0a0] hover:text-white transition-all"
+            className="w-full text-left px-4 py-3 bg-surface border border-white/[0.07] hover:border-buy/40 hover:bg-buy/5 rounded-lg text-sm text-[#a0a0a0] hover:text-primary transition-colors"
           >
             {opt}
           </button>

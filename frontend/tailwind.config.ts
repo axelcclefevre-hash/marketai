@@ -1,42 +1,25 @@
 import type { Config } from "tailwindcss";
 
+// Tokens = variables CSS (app/globals.css) → un seul endroit pour changer le thème.
+const c = (v: string) => `rgb(var(--${v}) / <alpha-value>)`;
+
 const config: Config = {
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  content: ["./app/**/*.{js,ts,jsx,tsx,mdx}", "./components/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     extend: {
       colors: {
-        bg:       "#0a0a0a",
-        surface:  "#111111",
-        surface2: "#1a1a1a",
-        border:   "rgba(255,255,255,0.08)",
-        primary:  "#f5f5f5",
-        muted:    "#6b7280",
-        buy:      "#00d97e",
-        sell:     "#ff4757",
-        hold:     "#ffd32a",
+        deep: c("deep"), bg: c("bg"), surface: c("surface"), surface2: c("surface2"),
+        primary: c("primary"), secondary: c("secondary"), muted: c("muted"),
+        buy: c("buy"), sell: c("sell"), hold: c("hold"),
+        border: "rgb(237 237 237 / 0.08)",
       },
       fontFamily: {
-        sans:  ["var(--font-geist-sans)", "Helvetica Neue", "sans-serif"],
-        mono:  ["var(--font-geist-mono)", "monospace"],
-        serif: ["Newsreader", "Georgia", "serif"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
-      animation: {
-        blink: "blink 2.4s infinite",
-        "fade-up": "fadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both",
-      },
+      animation: { "fade-up": "fadeUp 0.35s cubic-bezier(0.16,1,0.3,1) both" },
       keyframes: {
-        blink: {
-          "0%,100%": { opacity: "1" },
-          "50%":     { opacity: "0.2" },
-        },
-        fadeUp: {
-          from: { opacity: "0", transform: "translateY(12px)" },
-          to:   { opacity: "1", transform: "translateY(0)" },
-        },
+        fadeUp: { from: { opacity: "0", transform: "translateY(8px)" }, to: { opacity: "1", transform: "none" } },
       },
     },
   },
