@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Fira_Sans, Fira_Code } from "next/font/google";
 import "./globals.css";
 import AppShell from "@/components/layout/AppShell";
-import SessionProvider from "@/components/layout/SessionProvider";
 
 const sans = Fira_Sans({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-sans", display: "swap" });
 const mono = Fira_Code({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono", display: "swap" });
@@ -16,9 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr" className={`${sans.variable} ${mono.variable}`}>
       <body className="flex min-h-screen antialiased">
-        <SessionProvider>
-          <AppShell>{children}</AppShell>
-        </SessionProvider>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );
