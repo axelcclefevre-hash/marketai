@@ -1,9 +1,7 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { MODULES } from "@/lib/learn-content";
-import PremiumGate from "@/components/ui/PremiumGate";
 import { BookOpen, Clock, Star } from "@phosphor-icons/react";
 
 const LEVEL_COLOR: Record<string, string> = {
@@ -69,8 +67,6 @@ function HubContent() {
 
 export default function LearnHub() {
   return (
-    <PremiumGate feature="Apprendre à investir">
-      <HubContent />
-    </PremiumGate>
+    <HubContent />
   );
 }

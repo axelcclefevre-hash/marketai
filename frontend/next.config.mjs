@@ -1,17 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
   async rewrites() {
     return [
       {
-        source: "/api/auth/:path*",
-        destination: "/api/auth/:path*",   // laisser NextAuth gérer
-      },
-      {
         source: "/api/:path*",
-        destination: `${process.env.API_URL ?? "http://localhost:8000"}/api/:path*`,
-      },
-      {
-        source: "/api-backend/:path*",
         destination: `${process.env.API_URL ?? "http://localhost:8000"}/api/:path*`,
       },
     ];

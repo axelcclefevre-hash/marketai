@@ -1,9 +1,7 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { AreaChart, Area, PieChart, Pie, Cell, Tooltip, ResponsiveContainer, XAxis, YAxis } from "recharts";
-import PremiumGate from "@/components/ui/PremiumGate";
 import RiskQuestionnaire from "@/components/auth/RiskQuestionnaire";
 import MetricCard from "@/components/ui/MetricCard";
 import { fmt, fmtPct } from "@/lib/api";
@@ -19,17 +17,6 @@ const PROFILE_COLORS: Record<string, string> = {
 };
 
 export default function MyPortfolioClient() {
-  const { data: session } = useSession();
-  const user = session?.user as any;
-
-  return (
-    <PremiumGate feature="Portefeuille personnel">
-      <PortfolioContent token={user?.apiToken} />
-    </PremiumGate>
-  );
-}
-
-function PortfolioContent({ token }: { token: string }) {
   const [portfolio, setPortfolio] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -37,7 +24,7 @@ function PortfolioContent({ token }: { token: string }) {
 
   const load = async () => {
     setLoading(true);
-    const res = await fetch("/api/user/portfolio", { headers: { Authorization: `Bearer ${token}` } });
+    const res = await fetch("/api/user/portfolio");
     if (res.ok) {
       const d = await res.json();
       setPortfolio(d.portfolio);
@@ -45,14 +32,14 @@ function PortfolioContent({ token }: { token: string }) {
     setLoading(false);
   };
 
-  useEffect(() => { if (token) load(); }, [token]);
+  useEffect(() => { load(); }, []);
 
   const handleCreatePortfolio = async (risk_profile: string) => {
     setCreating(true);
     setShowQuestionnaire(false);
     const res = await fetch("/api/user/portfolio/create", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ risk_profile, initial_capital: 10000 }),
     });
     if (res.ok) {
@@ -67,7 +54,7 @@ function PortfolioContent({ token }: { token: string }) {
   if (creating) return (
     <div className="text-center py-20">
       <div className="text-muted text-sm animate-pulse mb-2">Claude construit ton portefeuille...</div>
-      <p className="text-xs text-muted/60">Analyse des signaux en cours (30-60 secondes)</p>
+      <p className="text-xs text-muted/60">Via `claude -p` en local, compte 30 à 90 secondes</p>
     </div>
   );
 

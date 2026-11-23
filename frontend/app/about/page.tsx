@@ -56,8 +56,6 @@ const STACK = [
   { label: "Python", color: "#3b82f6" },
   { label: "TypeScript", color: "#60a5fa" },
   { label: "Recharts", color: "#a78bfa" },
-  { label: "Stripe", color: "#635bff" },
-  { label: "Resend", color: "#4cc38a" },
   { label: "Claude Code", color: "#cc785c" },
   { label: "n8n", color: "#f97316" },
 ];

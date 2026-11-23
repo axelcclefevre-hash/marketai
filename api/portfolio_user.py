@@ -10,7 +10,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "financial_dashboard"))
 
-import anthropic
+from claude_cli import ask_claude, parse_json
+
+
 
 RISK_PROFILES = {
     "conservateur": {
@@ -76,7 +78,7 @@ def score_from_answers(answers: list[int]) -> str:
         return "agressif"
 
 
-def generate_user_portfolio(risk_profile: str, assets: dict, api_key: str, initial_capital: float = 10000.0) -> dict:
+def generate_user_portfolio(risk_profile: str, assets: dict, initial_capital: float = 10000.0) -> dict:
     """
     Génère un portefeuille personnalisé via Claude basé sur le profil de risque.
     Retourne un dict portfolio prêt à être stocké.
@@ -131,18 +133,7 @@ Règles :
 - Favorise les actifs avec signal BUY pour ce profil
 - Les actifs à haute volatilité (Crypto) ne doivent pas dépasser leur quota"""
 
-    client = anthropic.Anthropic(api_key=api_key)
-    msg = client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=800,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    raw = msg.content[0].text.strip()
-    if raw.startswith("```"):
-        raw = raw.split("```")[1]
-        if raw.startswith("json"):
-            raw = raw[4:]
-    result = json.loads(raw)
+    result = parse_json(ask_claude(prompt, timeout=300))
 
     # Construire les positions finales
     positions = []

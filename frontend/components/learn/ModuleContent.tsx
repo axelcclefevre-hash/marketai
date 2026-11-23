@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { getModule, MODULES, QuizQuestion } from "@/lib/learn-content";
-import PremiumGate from "@/components/ui/PremiumGate";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, CheckCircle, Clock, XCircle, Question } from "@phosphor-icons/react";
@@ -256,8 +255,6 @@ function ModuleInner({ moduleId }: { moduleId: string }) {
 
 export default function ModuleContent({ moduleId }: { moduleId: string }) {
   return (
-    <PremiumGate feature="Apprendre à investir">
-      <ModuleInner moduleId={moduleId} />
-    </PremiumGate>
+    <ModuleInner moduleId={moduleId} />
   );
 }

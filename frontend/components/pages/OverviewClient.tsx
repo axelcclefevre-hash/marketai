@@ -35,6 +35,7 @@ export default function OverviewClient() {
   const [refreshing, setRefreshing] = useState(false);
   const [failed, setFailed]       = useState(false);
   const [lastUpdate, setLastUpdate] = useState("");
+  const [ai, setAi]             = useState<{ available: boolean; running: boolean } | null>(null);
 
   const load = async (force = false) => {
     try {
@@ -43,6 +44,7 @@ export default function OverviewClient() {
       const d = await fetchMarketData(force);
       setData(d.assets ?? {});
       setLastUpdate(d.date ?? "");
+      setAi(d.ai ?? null);
     } catch {
       setFailed(true);
     } finally {
@@ -52,6 +54,13 @@ export default function OverviewClient() {
   };
 
   useEffect(() => { load(); }, []);
+
+  // Pendant que `claude -p` analyse en arrière-plan, on recharge régulièrement
+  useEffect(() => {
+    if (!ai?.running) return;
+    const t = setInterval(() => load(), 10000);
+    return () => clearInterval(t);
+  }, [ai?.running]);
 
   const assets = useMemo(() => {
     return Object.entries(data)
@@ -133,7 +142,9 @@ export default function OverviewClient() {
     <div>
       <PageHeader
         title="Vue d'ensemble"
-        subtitle={<>{Object.keys(data).length} actifs suivis{lastUpdate && <> · mis à jour {lastUpdate}</>}</>}
+        subtitle={<>{Object.keys(data).length} actifs suivis{lastUpdate && <> · mis à jour {lastUpdate}</>}
+            {ai?.running && <> · analyse IA en cours</>}
+            {ai && !ai.available && <> · signaux IA désactivés (Claude Code introuvable)</>}</>}
         action={
           <button
             onClick={() => load(true)}
